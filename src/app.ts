@@ -11,7 +11,6 @@ export class App {
   async getAssets(){
     this._renderer.loadAssets(
       "test.png",
-      "test1.png",
     );
   }
 }

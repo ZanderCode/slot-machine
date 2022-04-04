@@ -5,5 +5,13 @@ export class App {
 
   public constructor() {
     this._renderer = new Renderer();
+    this.getAssets();
+  }
+
+  async getAssets(){
+    this._renderer.loadAssets(
+      "test.png",
+      "test1.png",
+    );
   }
 }

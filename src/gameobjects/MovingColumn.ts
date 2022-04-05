@@ -1,5 +1,6 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
+import { convertTypeAcquisitionFromJson } from "typescript";
 
 export class MovingColumn implements GameObjects{
 
@@ -39,17 +40,11 @@ export class MovingColumn implements GameObjects{
     private _align(){
         if (this._axis === AXIS.Horizontal){
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
-                // Set the next childs y position equal to its height + difference between the two.
-                // This ensures that the next child is right after the previous child (even if the next child is larger than the first.)
-                let diff = Math.abs(this.children[next].transform.scale.y - this.children[prev].transform.scale.y);
-                this.children[next].transform.localTransform.ty = this.children[prev].transform.scale.y + diff;
+                this.children[next].transform.position.x = this.children[prev].transform.position.x + this.children[prev].getBounds().width;
             }
         }else if(this._axis === AXIS.Vertical){ 
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
-                // Set the next childs y position equal to its height + difference between the two.
-                // This ensures that the next child is right after the previous child (even if the next child is larger than the first.)
-                let diff = Math.abs(this.children[next].transform.scale.x - this.children[prev].transform.scale.x);
-                this.children[next].transform.localTransform.tx = this.children[prev].transform.scale.x + diff;
+                this.children[next].transform.position.y = this.children[prev].transform.position.y + this.children[prev].getBounds().height;
             }
         }
     }

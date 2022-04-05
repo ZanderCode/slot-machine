@@ -56,13 +56,31 @@ export class App {
 
     // TODO: create as many sprites, GameObjects, etc.
     // this below example just creates a sprite from each loaded texture.
-    this._dataResources.forEach((data)=>{
-      let texture = this._loader.resources[data.name]?.texture;
-      // Create Sprites
-      if (texture){
-        this._gameObjects.set(data.name, new Card(new PIXI.Sprite(texture)));
-      }
-    })
+    // this._dataResources.forEach((data)=>{
+    //   let texture = this._loader.resources[data.name]?.texture;
+    //   // Create Sprites
+    //   if (texture){
+    //     this._gameObjects.set(data.name, new Card(new PIXI.Sprite(texture)));
+    //   }
+    // })
+
+     // Create three sprites
+     let texName = this._dataResources[0].name;
+     let tex = this._loader.resources[texName].texture;
+
+     let sp1 = PIXI.Sprite.from(tex);
+     sp1.width = 100;
+     sp1.height = 100;
+     let sp2 = PIXI.Sprite.from(tex);
+     sp2.width = 200;
+     sp2.height = 200;
+     let sp3 = PIXI.Sprite.from(tex);
+     sp3.width = 100;
+     sp3.height = 100;
+
+     let moving = new MovingColumn([sp1,sp2,sp3],AXIS.Horizontal);
+
+     this._gameObjects.set("moving",moving);
 
     // Stage All
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));

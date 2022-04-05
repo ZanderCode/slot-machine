@@ -14,47 +14,31 @@ export class Renderer {
 
     document.body.appendChild(this._application.view);
     
+    // Defines where general assets are. Non-game breaking assets
     this._loader = PIXI.Loader.shared;
     this._loader.baseUrl = "assets/";
   }
 
-  addAssets(...assets:string[]){
+  addAssets(addedAssets:Function,onComplete:Function,...assets:string[]){
     
     //Asset file is the same as the asset name file+ext (ex. "ball_x" and "ball_x.png")
     assets.forEach((fileName,i)=>{
       this._loader.add(fileName.split(".")[0],fileName);
     });
 
-    this._loader.load((loader, resources) => {
-      Object.entries(resources).map((res)=>{
-        // Load sprite name from resources [res] which we added above
-        let sprite = new PIXI.Sprite(loader.resources[res[0]].texture);
-        sprite.visible = true;
-        this.addToStage(sprite);
-      });      
-    });
+    // Do something with the loaded assets.
+    addedAssets(this._loader);
+    this._loader.onComplete.add(()=>onComplete);
 
+    // TODO:remove game loop; place elsewhere
     this._loader.onComplete.add(()=>{
       this._application.ticker.add(()=>{
-      
-        let y = this._application.stage.children[0].transform.position.y;
-        let height = (<PIXI.Sprite> this._application.stage.children[0]).width;
 
-        this._application.stage.children[0].transform.position.y = y + 10; 
-
-        if (y > this._application.screen.height){
-          this._application.stage.children[0].transform.position.y = height * -1;
-        }
-      
       });
     });
   }
 
-  loadAssetsAndGame(loop:Function){
-
-  }
-
-  // Exposes stage to App
+  // Exposes stage to entire app
   addToStage(...stageable:PIXI.DisplayObject[]){
     this._application.stage.addChild(...stageable);
   }

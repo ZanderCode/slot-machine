@@ -18,7 +18,7 @@ export class Renderer {
     this._loader.baseUrl = "assets/";
   }
 
-  loadAssets(...assets:string[]){
+  addAssets(...assets:string[]){
     
     //Asset file is the same as the asset name file+ext (ex. "ball_x" and "ball_x.png")
     assets.forEach((fileName,i)=>{
@@ -48,6 +48,10 @@ export class Renderer {
       
       });
     });
+  }
+
+  loadAssetsAndGame(loop:Function){
+
   }
 
   // Exposes stage to App

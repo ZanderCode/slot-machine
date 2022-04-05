@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { ObjectFlags } from 'typescript';
 
 export class Renderer {
   private _application: PIXI.Application; 
@@ -18,7 +17,7 @@ export class Renderer {
     this._loader.baseUrl = "assets/";
   }
 
-  loadAssets(...assets:string[]){
+  addAssets(...assets:string[]){
     
     var sprites:PIXI.Sprite[] = [];
 
@@ -30,13 +29,14 @@ export class Renderer {
     this._loader.load((loader, resources) => {
       Object.entries(resources).map((res)=>{
         // Load sprite name from resources [res] which we added above
-        let sprite = new PIXI.Sprite(loader.resources[res[0]].texture);
-        sprites.push(sprite);
-        sprite.visible = true;
+        let tex = loader.resources[res[0]].texture;
+        let sprite = new PIXI.Sprite(tex);
         this.addToStage(sprite);
       });      
     });
+  }
 
+  loop(gameLoop:Function){
     this._loader.onComplete.add(()=>{
       this._application.ticker.add((delta)=>{
       

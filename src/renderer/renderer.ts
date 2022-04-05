@@ -20,6 +20,8 @@ export class Renderer {
 
   loadAssets(...assets:string[]){
     
+    var sprites:PIXI.Sprite[] = [];
+
     //Asset file is the same as the asset name file+ext (ex. "ball_x" and "ball_x.png")
     assets.forEach((fileName,i)=>{
       this._loader.add(fileName.split(".")[0],fileName);
@@ -29,18 +31,19 @@ export class Renderer {
       Object.entries(resources).map((res)=>{
         // Load sprite name from resources [res] which we added above
         let sprite = new PIXI.Sprite(loader.resources[res[0]].texture);
+        sprites.push(sprite);
         sprite.visible = true;
         this.addToStage(sprite);
       });      
     });
 
     this._loader.onComplete.add(()=>{
-      this._application.ticker.add(()=>{
+      this._application.ticker.add((delta)=>{
       
         let y = this._application.stage.children[0].transform.position.y;
         let height = (<PIXI.Sprite> this._application.stage.children[0]).width;
 
-        this._application.stage.children[0].transform.position.y = y + 10; 
+        this._application.stage.children[0].transform.position.y = y + 10*delta; 
 
         if (y > this._application.screen.height){
           this._application.stage.children[0].transform.position.y = height * -1;

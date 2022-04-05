@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js';
 
 export class Renderer {
   private _application: PIXI.Application; 
-  private _loader:PIXI.Loader;
 
   public constructor() {
 
@@ -12,28 +11,6 @@ export class Renderer {
     });
 
     document.body.appendChild(this._application.view);
-    
-    this._loader = PIXI.Loader.shared;
-    this._loader.baseUrl = "assets/";
-  }
-
-  addAssets(...assets:string[]){
-    
-    var sprites:PIXI.Sprite[] = [];
-
-    //Asset file is the same as the asset name file+ext (ex. "ball_x" and "ball_x.png")
-    assets.forEach((fileName,i)=>{
-      this._loader.add(fileName.split(".")[0],fileName);
-    });
-
-    this._loader.load((loader, resources) => {
-      Object.entries(resources).map((res)=>{
-        // Load sprite name from resources [res] which we added above
-        let tex = loader.resources[res[0]].texture;
-        let sprite = new PIXI.Sprite(tex);
-        this.addToStage(sprite);
-      });      
-    });
   }
 
   // Exposes stage to App
@@ -41,8 +18,9 @@ export class Renderer {
     this._application.stage.addChild(...stageable);
   }
 
-  loop(gameLoop:Function){
-    this._application.ticker.add((delta)=>gameLoop);
+  // Exposes the application ticker to allow for custom loops
+  loop(gameLoop:Function,gameObjects:Map<string,PIXI.DisplayObject>){
+    this._application.ticker.add((delta)=>gameLoop(delta,gameObjects));
   }
 }
 

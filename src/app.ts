@@ -27,7 +27,7 @@ export class App {
 
   //_sprite:string refers to _dataResources.name
   private _dataResources:DataResource[];
-  private _sprites:Map<string,PIXI.Sprite>;
+  private _sprites:Map<string,PIXI.DisplayObject>;
 
   public constructor() {
     this._renderer = new Renderer();
@@ -42,6 +42,7 @@ export class App {
     this.addDataResource("ball1","test1.png");
 
     this._loader.onComplete.add(()=>this.createGameObjects(true));
+    this._loader.load();
   }
 
   // Adds a new resource to the loader
@@ -54,28 +55,30 @@ export class App {
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
 
-    this._loader.load((loader,res)=>{
-      this._dataResources.forEach((data)=>{
-        let texture = res[data.name]?.texture;
-        // Create Sprites
-        if (texture){
-          this._sprites.set(data.name, new PIXI.Sprite(texture));
-        }
-      })
-    });
+    // TODO: create as many sprites, GameObjects, etc.
+    // this below example just creates a sprite from each loaded texture.
+    this._dataResources.forEach((data)=>{
+      let texture = this._loader.resources[data.name]?.texture;
+      // Create Sprites
+      if (texture){
+        this._sprites.set(data.name, new PIXI.Sprite(texture));
+      }
+    })
 
     // Stage All
     this._sprites.forEach((sprite)=>this._renderer.addToStage(sprite));
 
     // Start Game Loop
+    // In order to use the gameLoop callback, we must pass through
+    // all of the game objects created by this function.
     if(startGameLoop){
-      this._renderer.loop(this.gameLoop);
+      this._renderer.loop(this.gameLoop,this._sprites);
     }
   }
 
   // Game Logic and state management
-  gameLoop(delta:number){
-    console.log(delta);
+  gameLoop(delta:number,gameObjects:Map<string,PIXI.DisplayObject>){
+    //logic here:
   }
 
 }

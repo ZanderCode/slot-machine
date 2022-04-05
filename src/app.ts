@@ -1,9 +1,8 @@
 import { Renderer } from './renderer/renderer';
-import {AXIS} from "./gameobjects/GameObject";
+import {GameObject, AXIS} from "./gameobjects/GameObject";
 import {Card} from "./gameobjects/Card";
 import {MovingColumn} from "./gameobjects/MovingColumn";
 import * as PIXI from "pixi.js";
-import { convertCompilerOptionsFromJson } from 'typescript';
 
 // Helper for managing data and starting
 // Asset and GameObject creation during
@@ -27,12 +26,12 @@ export class App {
 
   //_sprite:string refers to _dataResources.name
   private _dataResources:DataResource[];
-  private _sprites:Map<string,PIXI.DisplayObject>;
+  private _gameObjects:Map<string,GameObject>;
 
   public constructor() {
     this._renderer = new Renderer();
     this._dataResources = [];
-    this._sprites = new Map<string,PIXI.Sprite>();     
+    this._gameObjects = new Map<string,GameObject>();     
 
     // Load Assets, Create Game Objects
     this._loader = PIXI.Loader.shared;
@@ -61,24 +60,26 @@ export class App {
       let texture = this._loader.resources[data.name]?.texture;
       // Create Sprites
       if (texture){
-        this._sprites.set(data.name, new PIXI.Sprite(texture));
+        this._gameObjects.set(data.name, new Card(new PIXI.Sprite(texture)));
       }
     })
 
     // Stage All
-    this._sprites.forEach((sprite)=>this._renderer.addToStage(sprite));
+    this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
 
     // Start Game Loop
     // In order to use the gameLoop callback, we must pass through
     // all of the game objects created by this function.
     if(startGameLoop){
-      this._renderer.loop(this.gameLoop,this._sprites);
+      this._renderer.loop(this.gameLoop,this._gameObjects);
     }
   }
 
   // Game Logic and state management
-  gameLoop(delta:number,gameObjects:Map<string,PIXI.DisplayObject>){
-    //logic here:
+  gameLoop(delta:number,gameObjects:Map<string,GameObject>){
+    gameObjects.forEach(go => {
+      go.animate(delta);
+    });
   }
 
 }

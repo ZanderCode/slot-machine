@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { GameObject } from "../gameobjects/GameObject"
 
 export class Renderer {
   private _application: PIXI.Application; 
@@ -19,7 +20,7 @@ export class Renderer {
   }
 
   // Exposes the application ticker to allow for custom loops
-  loop(gameLoop:Function,gameObjects:Map<string,PIXI.DisplayObject>){
+  loop(gameLoop:Function,gameObjects:Map<string,GameObject>){
     this._application.ticker.add((delta)=>gameLoop(delta,gameObjects));
   }
 }

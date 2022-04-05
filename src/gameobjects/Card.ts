@@ -10,7 +10,7 @@ export class Card implements GameObject{
     }
 
     animate(delta:number):void{
-        return;
+        this.child.setTransform(this.child.x,this.child.y+(5*delta))
     }
 
     getRenderable():PIXI.DisplayObject{

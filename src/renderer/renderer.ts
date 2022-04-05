@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { ObjectFlags } from 'typescript';
 
 export class Renderer {
   private _application: PIXI.Application; 
@@ -14,31 +13,36 @@ export class Renderer {
 
     document.body.appendChild(this._application.view);
     
-    // Defines where general assets are. Non-game breaking assets
     this._loader = PIXI.Loader.shared;
     this._loader.baseUrl = "assets/";
   }
 
-  addAssets(addedAssets:Function,onComplete:Function,...assets:string[]){
+  addAssets(...assets:string[]){
     
     //Asset file is the same as the asset name file+ext (ex. "ball_x" and "ball_x.png")
     assets.forEach((fileName,i)=>{
       this._loader.add(fileName.split(".")[0],fileName);
     });
 
-    // Do something with the loaded assets.
-    addedAssets(this._loader);
-    this._loader.onComplete.add(()=>onComplete);
+    this._loader.load((loader, resources) => {
+      Object.entries(resources).map((res)=>{
+        // Load sprite name from resources [res] which we added above
+        let tex = loader.resources[res[0]].texture;
+        let sprite = new PIXI.Sprite(tex);
+        //this.addToStage(sprite);
+      });      
+    });
+  }
 
-    // TODO:remove game loop; place elsewhere
+  loop(gameLoop:Function){
     this._loader.onComplete.add(()=>{
       this._application.ticker.add(()=>{
-
+        gameLoop();
       });
     });
   }
 
-  // Exposes stage to entire app
+  // Exposes stage to App
   addToStage(...stageable:PIXI.DisplayObject[]){
     this._application.stage.addChild(...stageable);
   }

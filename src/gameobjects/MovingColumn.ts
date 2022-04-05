@@ -28,23 +28,23 @@ export class MovingColumn implements GameObjects{
         // then the rest of the childnre follow.
         
         if (this._isMoving){
-            if (this._axis == AXIS.Horizontal){
+            if (this._axis === AXIS.Horizontal){
                 this.children[0].transform.position.x = this.children[0].position.x + (this.moveAmount*delta)
-            }else if (this._axis == AXIS.Vertical){
+            }else if (this._axis === AXIS.Vertical){
                 this.children[0].transform.position.y = this.children[0].position.y + (this.moveAmount*delta)
             }
         }
     }
 
     private _align(){
-        if (this._axis == AXIS.Horizontal){
+        if (this._axis === AXIS.Horizontal){
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
                 // Set the next childs y position equal to its height + difference between the two.
                 // This ensures that the next child is right after the previous child (even if the next child is larger than the first.)
                 let diff = Math.abs(this.children[next].transform.scale.y - this.children[prev].transform.scale.y);
                 this.children[next].transform.localTransform.ty = this.children[prev].transform.scale.y + diff;
             }
-        }else if(this._axis == AXIS.Vertical){ 
+        }else if(this._axis === AXIS.Vertical){ 
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
                 // Set the next childs y position equal to its height + difference between the two.
                 // This ensures that the next child is right after the previous child (even if the next child is larger than the first.)
@@ -58,6 +58,8 @@ export class MovingColumn implements GameObjects{
         this._isMoving = !this._isMoving;
     }
 
-
+    getRenderable():PIXI.DisplayObject{
+        return this.child;
+    }
 
 }

@@ -36,26 +36,13 @@ export class Renderer {
     });
   }
 
-  loop(gameLoop:Function){
-    this._loader.onComplete.add(()=>{
-      this._application.ticker.add((delta)=>{
-      
-        let y = this._application.stage.children[0].transform.position.y;
-        let height = (<PIXI.Sprite> this._application.stage.children[0]).width;
-
-        this._application.stage.children[0].transform.position.y = y + 10*delta; 
-
-        if (y > this._application.screen.height){
-          this._application.stage.children[0].transform.position.y = height * -1;
-        }
-      
-      });
-    });
-  }
-
   // Exposes stage to App
   addToStage(...stageable:PIXI.DisplayObject[]){
     this._application.stage.addChild(...stageable);
+  }
+
+  loop(gameLoop:Function){
+    this._application.ticker.add((delta)=>gameLoop);
   }
 }
 

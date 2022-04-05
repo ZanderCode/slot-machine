@@ -12,14 +12,24 @@ export class MovingColumn implements GameObjects{
     private _container:PIXI.Container;
 
 
-    constructor(container:PIXI.DisplayObject[],axis?:AXIS,moveAmount?:number){
+    constructor(container:PIXI.DisplayObject[],isMoving?:boolean,axis?:AXIS,moveAmount?:number){
         this.children = container;
-        this._isMoving = false;
+        this._isMoving = isMoving??false;
         this._axis=axis??AXIS.Vertical;
         this._container = new PIXI.Container();
         this.child = this._container;
+
+        let boarder = new PIXI.Container();
+        let g = new PIXI.Graphics();
+        g.beginFill(0xff0000);
+        g.drawRect(0,0,100,300);
+        boarder.addChild(g);
+        this._container.addChild(boarder);
+        this._container.mask = boarder;
+
         this._container.addChild(...this.children);
         this.moveAmount = moveAmount??10;
+
     }
 
     animate(delta:number):void{

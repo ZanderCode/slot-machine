@@ -72,15 +72,28 @@ export class App {
      sp1.width = 100;
      sp1.height = 100;
      let sp2 = PIXI.Sprite.from(tex);
-     sp2.width = 200;
-     sp2.height = 200;
+     sp2.width = 100;
+     sp2.height = 100;
      let sp3 = PIXI.Sprite.from(tex);
      sp3.width = 100;
      sp3.height = 100;
 
-     let moving = new MovingColumn([sp1,sp2,sp3],AXIS.Horizontal);
+     let sp4 = PIXI.Sprite.from(tex);
+     sp4.width = 100;
+     sp4.height = 100;
+     let sp5 = PIXI.Sprite.from(tex);
+     sp5.width = 100;
+     sp5.height = 100;
+     let sp6 = PIXI.Sprite.from(tex);
+     sp6.width = 100;
+     sp6.height = 100;
+
+     let moving = new MovingColumn([sp1,sp2,sp3],false,AXIS.Vertical,1);
+     let moving2 = new MovingColumn([sp4,sp5,sp6],false,AXIS.Vertical,1);
+     moving2.child.position.x = 100;
 
      this._gameObjects.set("moving",moving);
+     this._gameObjects.set("moving2",moving2);
 
     // Stage All
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));

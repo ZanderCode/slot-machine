@@ -29,7 +29,7 @@ export class Renderer {
         // Load sprite name from resources [res] which we added above
         let tex = loader.resources[res[0]].texture;
         let sprite = new PIXI.Sprite(tex);
-        //this.addToStage(sprite);
+        this.addToStage(sprite);
       });      
     });
   }

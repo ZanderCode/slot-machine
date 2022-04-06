@@ -1,6 +1,11 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
 
+export enum TargetType{
+    Random,
+    Normal
+}
+
 // TODO: change to Slot
 export class MovingColumn implements GameObjects{
 
@@ -16,18 +21,23 @@ export class MovingColumn implements GameObjects{
 
 
     constructor(container:PIXI.DisplayObject[],
-        visibleObjects:number,
-        dim:number,
         isMoving?:boolean,
+        visibleObjects?:number,
+        dim?:number,
         axis?:AXIS,
         moveAmount?:number){
 
-        if (visibleObjects >= container.length){
+        if (container.length < 2){
+            console.error("The number of elements in a MovingColumn should be 2 or more");
+        }
+
+        if (visibleObjects??container.length-1 >= container.length){
             console.error("The number of visible objects must be 1 less than the total number of children objects");
         }
 
-        this._visibleObjects = visibleObjects;
-        this._dim = dim;
+        this._visibleObjects = visibleObjects??container.length-1;
+        this._dim = dim??100;
+        this.moveAmount = moveAmount??10;
 
         this.children = container;
         this._isMoving = isMoving??false;
@@ -35,24 +45,32 @@ export class MovingColumn implements GameObjects{
         this._container = new PIXI.Container();
         this.child = this._container;
 
+        // Making the overflowing elements
         let boarderMask = new PIXI.Container();
         let g = new PIXI.Graphics();
         g.beginFill(0xff0000);
-        g.drawRect(0,0,this._dim,visibleObjects*this._dim);
+        if (this._axis === AXIS.Vertical){
+            g.drawRect(0,0,this._dim,this._visibleObjects*this._dim);
+        }else{
+            g.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
+        }
         boarderMask.addChild(g);
         this._container.addChild(boarderMask);
 
+        // Add a boarder so we know the bounds
         let boarder = new PIXI.Container();
         let g2 = new PIXI.Graphics();
         g2.beginFill(0x0000ff);
-        g2.drawRect(0,0,this._dim,visibleObjects*this._dim);
+        if (this._axis === AXIS.Vertical){
+            g2.drawRect(0,0,this._dim,this._visibleObjects*this._dim);
+        }else{
+            g2.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
+        }
         boarder.addChild(g2);
         
         this._container.mask = boarder;
         this.child.addChild(boarder);
         this._container.addChild(...this.children);
-        this.moveAmount = moveAmount??10;
-
     }
 
     animate(delta:number):void{
@@ -78,16 +96,25 @@ export class MovingColumn implements GameObjects{
 
             if(this.children[this.children.length-1].transform.position.y > this._visibleObjects*this._dim){
                 this.shift()
+            }else if(this.children[this.children.length-1].transform.position.x > this._visibleObjects*this._dim){
+                this.shift()
             }
         }   
     }
 
     //TODO: add directiopn
     private shift(){
-        let last = this.children[this.children.length-1]
-        this.children.pop();
-        last.setTransform(0,this.children[0].transform.position.y-this._dim,last.scale.x,last.scale.y);
-        this.children.unshift(last);
+        if (this._axis === AXIS.Vertical){
+            let last = this.children[this.children.length-1]
+            this.children.pop();
+            last.setTransform(0,this.children[0].transform.position.y-this._dim,last.scale.x,last.scale.y);
+            this.children.unshift(last);
+        }else{
+            let last = this.children[this.children.length-1]
+            this.children.pop();
+            last.setTransform(this.children[0].transform.position.x-this._dim,0,last.scale.x,last.scale.y);
+            this.children.unshift(last);
+        }
     }
 
     private _align(){
@@ -102,6 +129,7 @@ export class MovingColumn implements GameObjects{
         }
     }
 
+    // Behavior:
     onClick(){
         this._isMoving = !this._isMoving;
     }

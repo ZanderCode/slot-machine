@@ -53,17 +53,7 @@ export class App {
 
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
-
-    // TODO: create as many sprites, GameObjects, etc.
-    // this below example just creates a sprite from each loaded texture.
-    // this._dataResources.forEach((data)=>{
-    //   let texture = this._loader.resources[data.name]?.texture;
-    //   // Create Sprites
-    //   if (texture){
-    //     this._gameObjects.set(data.name, new Card(new PIXI.Sprite(texture)));
-    //   }
-    // })
-
+    
      // Create three sprites
     let texName = this._dataResources[0].name;
     let texName2 = this._dataResources[1].name;
@@ -109,15 +99,15 @@ export class App {
     sp6.width = dim;
     sp6.height = dim;
 
-    let moving = new MovingColumn([sp1,sp2,sp3],2,dim,true,AXIS.Vertical,1);
-    let moving2 = new MovingColumn([sp4,sp5,sp6,sp7],3,dim,true,AXIS.Vertical,1);
-    let moving3 = new MovingColumn([sp8,sp9,sp10,sp11],3,dim,true,AXIS.Vertical,1);
+    let moving = new MovingColumn([sp1,sp2,sp3],true,undefined,dim,AXIS.Vertical);
+    let moving2 = new MovingColumn([sp4,sp5,sp6],true,undefined,dim,AXIS.Horizontal);
+    //let moving3 = new MovingColumn([sp8,sp9,sp10,sp11],true);
     moving2.child.position.x = dim;
-    moving3.child.position.x = dim*2;
+    //moving3.child.position.x = dim*2;
 
     this._gameObjects.set("moving",moving);
     this._gameObjects.set("moving2",moving2);
-    this._gameObjects.set("moving3",moving3);
+    //this._gameObjects.set("moving3",moving3);
 
     // Stage All
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));

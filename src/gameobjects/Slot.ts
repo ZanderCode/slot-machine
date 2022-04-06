@@ -22,18 +22,18 @@ export class Slot implements GameObjects{
 
     constructor(container:PIXI.Texture[],
         isMoving?:boolean,
-        visibleObjects?:number,
+        visibleObjects:number=3,
         dim?:number,
         axis?:AXIS,
         moveAmount?:number){
 
 
         if (container.length < 2){
-            console.error("The number of elements in a MovingColumn should be 2 or more.");
+            console.error("The number of elements in a Slot Object should be 2 or more.");
         }
 
-        if (visibleObjects??container.length >= container.length){
-            console.error("The number of visible objects must be 1 less than the total number of children objects.");
+        if (visibleObjects??container.length-1 >= container.length){
+            console.error("The number of visible objects must be at least 1 less than the total number of children objects.");
         }
 
         this._visibleObjects = visibleObjects??container.length-1;

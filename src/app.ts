@@ -66,7 +66,11 @@ export class App {
 
     let moving = new Slot([tex1,tex2,tex1,tex2,tex1,tex2,tex1],false,3,dim,AXIS.Vertical,10);
     let moving2 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
+    let moving3 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
+    let moving4 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
     moving2.child.position.x = dim;
+    moving3.child.position.x = dim*2;
+    moving4.child.position.x = dim*3;
 
     let L = new Symbol<TetrisTypes>(tex1,TetrisTypes.L);
     let J = new Symbol<TetrisTypes>(tex1,TetrisTypes.J);
@@ -76,16 +80,19 @@ export class App {
     let T = new Symbol<TetrisTypes>(tex1,TetrisTypes.T);
     let I = new Symbol<TetrisTypes>(tex1,TetrisTypes.I);
     
-    let lever = new Lever(async ()=>{
+    let leverRadius = dim/2;
+    let lever = new Lever(dim*4+leverRadius,leverRadius,leverRadius,(dim*3)-(leverRadius*2));
+    let slot = new SlotMachine(lever,[moving,moving2,moving3,moving4]);
+    lever.addActivateBehavior(async ()=>{
       await slot.start();
       await slot.stop();
-    },100,300);
-
-    let slot = new SlotMachine(lever,[moving,moving2]);
+    });
     
     // Stage All
     this._gameObjects.set("Slot1",moving);
     this._gameObjects.set("Slot2",moving2);
+    this._gameObjects.set("Slot3",moving3);
+    this._gameObjects.set("Slot4",moving4);
     this._gameObjects.set("Lever",lever);
     this._gameObjects.set("SlotMachine",slot);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));

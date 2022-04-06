@@ -65,35 +65,59 @@ export class App {
     // })
 
      // Create three sprites
-     let texName = this._dataResources[0].name;
-     let tex = this._loader.resources[texName].texture;
+    let texName = this._dataResources[0].name;
+    let texName2 = this._dataResources[1].name;
+    let tex = this._loader.resources[texName].texture;
+    let tex2 = this._loader.resources[texName2].texture;
+    let dim = 100;
 
-     let sp1 = PIXI.Sprite.from(tex);
-     sp1.width = 100;
-     sp1.height = 100;
-     let sp2 = PIXI.Sprite.from(tex);
-     sp2.width = 100;
-     sp2.height = 100;
-     let sp3 = PIXI.Sprite.from(tex);
-     sp3.width = 100;
-     sp3.height = 100;
+    // TODO: Refactor this nasty nasty. Place texture inside
+    // MovingColumn. Generate sprites inside its constructor?
+    let sp1 = PIXI.Sprite.from(tex);
+    sp1.width = dim;
+    sp1.height = dim;
+    let sp2 = PIXI.Sprite.from(tex);
+    sp2.width = dim;
+    sp2.height = dim;
+    let sp3 = PIXI.Sprite.from(tex);
+    sp3.width = dim;
+    sp3.height = dim;
+    let sp7 = PIXI.Sprite.from(tex2);
+    sp7.width = dim;
+    sp7.height = dim;
 
-     let sp4 = PIXI.Sprite.from(tex);
-     sp4.width = 100;
-     sp4.height = 100;
-     let sp5 = PIXI.Sprite.from(tex);
-     sp5.width = 100;
-     sp5.height = 100;
-     let sp6 = PIXI.Sprite.from(tex);
-     sp6.width = 100;
-     sp6.height = 100;
+    let sp8 = PIXI.Sprite.from(tex);
+    sp8.width = dim;
+    sp8.height = dim;
+    let sp9 = PIXI.Sprite.from(tex);
+    sp9.width = dim;
+    sp9.height = dim;
+    let sp10 = PIXI.Sprite.from(tex);
+    sp10.width = dim;
+    sp10.height = dim;
+    let sp11 = PIXI.Sprite.from(tex2);
+    sp11.width = dim;
+    sp11.height = dim;
 
-     let moving = new MovingColumn([sp1,sp2,sp3],false,AXIS.Vertical,1);
-     let moving2 = new MovingColumn([sp4,sp5,sp6],false,AXIS.Vertical,1);
-     moving2.child.position.x = 100;
+    let sp4 = PIXI.Sprite.from(tex);
+    sp4.width = dim;
+    sp4.height = dim;
+    let sp5 = PIXI.Sprite.from(tex);
+    sp5.width = dim;
+    sp5.height = dim;
+    let sp6 = PIXI.Sprite.from(tex);
+    sp6.width = dim;
+    sp6.height = dim;
 
-     this._gameObjects.set("moving",moving);
-     this._gameObjects.set("moving2",moving2);
+    let moving = new MovingColumn([sp1,sp2,sp3],2,dim,true,AXIS.Vertical,1);
+    let moving2 = new MovingColumn([sp4,sp5,sp6,sp7],3,dim,true,AXIS.Vertical,1);
+    let moving3 = new MovingColumn([sp8,sp9,sp10,sp11],3,dim,true,AXIS.Vertical,1);
+    moving2.child.position.x = dim;
+    moving3.child.position.x = dim*2;
+
+    this._gameObjects.set("moving",moving);
+    this._gameObjects.set("moving2",moving2);
+    this._gameObjects.set("moving3",moving3);
 
     // Stage All
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));

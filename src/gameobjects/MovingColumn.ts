@@ -1,5 +1,6 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
+import { runInThisContext } from "vm";
 
 export enum TargetType{
     Random,
@@ -9,8 +10,8 @@ export enum TargetType{
 // TODO: change to Slot
 export class MovingColumn implements GameObjects{
 
-    children:PIXI.DisplayObject[];
-    child:PIXI.Container;
+    public children:PIXI.DisplayObject[];
+    public child:PIXI.Container;
     private moveAmount:number;
     private _isMoving:boolean;
     private _axis:AXIS;
@@ -20,7 +21,7 @@ export class MovingColumn implements GameObjects{
     private _visibleObjects:number;
 
 
-    constructor(container:PIXI.DisplayObject[],
+    constructor(container:PIXI.Texture[],
         isMoving?:boolean,
         visibleObjects?:number,
         dim?:number,
@@ -28,25 +29,25 @@ export class MovingColumn implements GameObjects{
         moveAmount?:number){
 
         if (container.length < 2){
-            console.error("The number of elements in a MovingColumn should be 2 or more");
+            console.error("The number of elements in a MovingColumn should be 2 or more.");
         }
 
         if (visibleObjects??container.length-1 >= container.length){
-            console.error("The number of visible objects must be 1 less than the total number of children objects");
+            console.error("The number of visible objects must be 1 less than the total number of children objects.");
         }
 
         this._visibleObjects = visibleObjects??container.length-1;
-        this._dim = dim??100;
         this.moveAmount = moveAmount??10;
-
-        this.children = container;
         this._isMoving = isMoving??false;
         this._axis=axis??AXIS.Vertical;
+        this._dim = dim??100;
+
         this._container = new PIXI.Container();
         this.child = this._container;
+           
 
-        // Making the overflowing elements
-        let boarderMask = new PIXI.Container();
+        // Create a Mask to hide off-screen elements of the slider
+        let borderMask = new PIXI.Container();
         let g = new PIXI.Graphics();
         g.beginFill(0xff0000);
         if (this._axis === AXIS.Vertical){
@@ -54,11 +55,12 @@ export class MovingColumn implements GameObjects{
         }else{
             g.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
         }
-        boarderMask.addChild(g);
-        this._container.addChild(boarderMask);
+        borderMask.addChild(g);
+        this._container.addChild(borderMask);
+        this._container.mask = borderMask;
 
         // Add a boarder so we know the bounds
-        let boarder = new PIXI.Container();
+        let border = new PIXI.Container();
         let g2 = new PIXI.Graphics();
         g2.beginFill(0x0000ff);
         if (this._axis === AXIS.Vertical){
@@ -66,10 +68,17 @@ export class MovingColumn implements GameObjects{
         }else{
             g2.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
         }
-        boarder.addChild(g2);
-        
-        this._container.mask = boarder;
-        this.child.addChild(boarder);
+        border.addChild(g2);
+        this.child.addChild(border);
+
+        // Create sprites out of the textures
+        this.children = [];
+        this.children.push(...container.flatMap((c)=>{
+            let sprt = new PIXI.Sprite(c);
+            sprt.width = this._dim;
+            sprt.height = this._dim;
+            return sprt;
+        }))     
         this._container.addChild(...this.children);
     }
 
@@ -102,7 +111,6 @@ export class MovingColumn implements GameObjects{
         }   
     }
 
-    //TODO: add directiopn
     private shift(){
         if (this._axis === AXIS.Vertical){
             let last = this.children[this.children.length-1]

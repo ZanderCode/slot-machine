@@ -54,55 +54,17 @@ export class App {
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
     
-     // Create three sprites
-    let texName = this._dataResources[0].name;
-    let texName2 = this._dataResources[1].name;
-    let tex = this._loader.resources[texName].texture;
-    let tex2 = this._loader.resources[texName2].texture;
+    let tex1Name = this._dataResources[0].name;
+    let tex2Name = this._dataResources[1].name;
+    let tex1 = this._loader.resources[tex1Name].texture;
+    let tex2 = this._loader.resources[tex2Name].texture;
     let dim = 100;
 
-    // TODO: Refactor this nasty nasty. Place texture inside
-    // MovingColumn. Generate sprites inside its constructor?
-    let sp1 = PIXI.Sprite.from(tex);
-    sp1.width = dim;
-    sp1.height = dim;
-    let sp2 = PIXI.Sprite.from(tex);
-    sp2.width = dim;
-    sp2.height = dim;
-    let sp3 = PIXI.Sprite.from(tex);
-    sp3.width = dim;
-    sp3.height = dim;
-    let sp7 = PIXI.Sprite.from(tex2);
-    sp7.width = dim;
-    sp7.height = dim;
-
-    let sp8 = PIXI.Sprite.from(tex);
-    sp8.width = dim;
-    sp8.height = dim;
-    let sp9 = PIXI.Sprite.from(tex);
-    sp9.width = dim;
-    sp9.height = dim;
-    let sp10 = PIXI.Sprite.from(tex);
-    sp10.width = dim;
-    sp10.height = dim;
-    let sp11 = PIXI.Sprite.from(tex2);
-    sp11.width = dim;
-    sp11.height = dim;
-
-    let sp4 = PIXI.Sprite.from(tex);
-    sp4.width = dim;
-    sp4.height = dim;
-    let sp5 = PIXI.Sprite.from(tex);
-    sp5.width = dim;
-    sp5.height = dim;
-    let sp6 = PIXI.Sprite.from(tex);
-    sp6.width = dim;
-    sp6.height = dim;
-
-    let moving = new MovingColumn([sp1,sp2,sp3],true,undefined,dim,AXIS.Vertical);
-    let moving2 = new MovingColumn([sp4,sp5,sp6],true,undefined,dim,AXIS.Horizontal);
+    let moving = new MovingColumn([tex1,tex2,tex1,tex2,tex1,tex2,tex1],true,undefined,dim,AXIS.Vertical);
+    let moving2 = new MovingColumn([tex2,tex1,tex2,tex1,tex2],false,undefined,dim,AXIS.Horizontal);
     //let moving3 = new MovingColumn([sp8,sp9,sp10,sp11],true);
-    moving2.child.position.x = dim;
+    moving2.child.position.x = dim+100;
+    moving2.child.position.y = dim+100;
     //moving3.child.position.x = dim*2;
 
     this._gameObjects.set("moving",moving);

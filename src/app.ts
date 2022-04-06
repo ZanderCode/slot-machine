@@ -1,8 +1,11 @@
 import { Renderer } from './renderer/renderer';
 import {GameObject, AXIS} from "./gameobjects/GameObject";
-import {Card} from "./gameobjects/Card";
-import {MovingColumn} from "./gameobjects/MovingColumn";
+import {SlotMachine} from "./gameobjects/SlotMachine";
+import {Slot} from "./gameobjects/Slot";
+import {Symbol} from "./gameobjects/Symbol";
 import * as PIXI from "pixi.js";
+import { Lever } from './gameobjects/Lever';
+import { TetrisTypes } from './TetrisTypes';
 
 // Helper for managing data and starting
 // Asset and GameObject creation during
@@ -54,24 +57,37 @@ export class App {
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
     
+    // Create GameObject and other renderables.
     let tex1Name = this._dataResources[0].name;
     let tex2Name = this._dataResources[1].name;
     let tex1 = this._loader.resources[tex1Name].texture;
     let tex2 = this._loader.resources[tex2Name].texture;
-    let dim = 100;
+    let dim:number = 100;
 
-    let moving = new MovingColumn([tex1,tex2,tex1,tex2,tex1,tex2,tex1],true,undefined,dim,AXIS.Vertical);
-    let moving2 = new MovingColumn([tex2,tex1,tex2,tex1,tex2],false,undefined,dim,AXIS.Horizontal);
-    //let moving3 = new MovingColumn([sp8,sp9,sp10,sp11],true);
-    moving2.child.position.x = dim+100;
-    moving2.child.position.y = dim+100;
-    //moving3.child.position.x = dim*2;
+    let moving = new Slot([tex1,tex2,tex1,tex2,tex1,tex2,tex1],false,3,dim,AXIS.Vertical,10);
+    let moving2 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
+    moving2.child.position.x = dim;
 
-    this._gameObjects.set("moving",moving);
-    this._gameObjects.set("moving2",moving2);
-    //this._gameObjects.set("moving3",moving3);
+    let L = new Symbol<TetrisTypes>(tex1,TetrisTypes.L);
+    let J = new Symbol<TetrisTypes>(tex1,TetrisTypes.J);
+    let S = new Symbol<TetrisTypes>(tex1,TetrisTypes.S);
+    let Z = new Symbol<TetrisTypes>(tex1,TetrisTypes.Z);
+    let O = new Symbol<TetrisTypes>(tex1,TetrisTypes.O);
+    let T = new Symbol<TetrisTypes>(tex1,TetrisTypes.T);
+    let I = new Symbol<TetrisTypes>(tex1,TetrisTypes.I);
+    
+    let lever = new Lever(async ()=>{
+      await slot.start();
+      await slot.stop();
+    },100,300);
 
+    let slot = new SlotMachine(lever,[moving,moving2]);
+    
     // Stage All
+    this._gameObjects.set("Slot1",moving);
+    this._gameObjects.set("Slot2",moving2);
+    this._gameObjects.set("Lever",lever);
+    this._gameObjects.set("SlotMachine",slot);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
 
     // Start Game Loop
@@ -83,9 +99,10 @@ export class App {
   }
 
   // Game Logic and state management
+  // States = Idle, Rolling, Stopping, Prize
   gameLoop(delta:number,gameObjects:Map<string,GameObject>){
     gameObjects.forEach(go => {
-      go.animate(delta);
+      go.frame(delta);
     });
   }
 

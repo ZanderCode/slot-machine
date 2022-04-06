@@ -2,9 +2,9 @@ import * as PIXI from 'pixi.js';
 
 export interface GameObject{
 
-    animate:Function;
+    isActive:boolean;
+    frame:Function;
     child:PIXI.DisplayObject;
-    onClick?:Function;
     getRenderable:()=>PIXI.DisplayObject;
 
 }

@@ -1,14 +1,12 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
-import { runInThisContext } from "vm";
 
 export enum TargetType{
     Random,
     Normal
 }
 
-// TODO: change to Slot
-export class MovingColumn implements GameObjects{
+export class Slot implements GameObjects{
 
     public children:PIXI.DisplayObject[];
     public child:PIXI.Container;
@@ -20,6 +18,7 @@ export class MovingColumn implements GameObjects{
     private _dim:number;
     private _visibleObjects:number;
 
+    isActive: boolean;
 
     constructor(container:PIXI.Texture[],
         isMoving?:boolean,
@@ -28,17 +27,19 @@ export class MovingColumn implements GameObjects{
         axis?:AXIS,
         moveAmount?:number){
 
+
         if (container.length < 2){
             console.error("The number of elements in a MovingColumn should be 2 or more.");
         }
 
-        if (visibleObjects??container.length-1 >= container.length){
+        if (visibleObjects??container.length >= container.length){
             console.error("The number of visible objects must be 1 less than the total number of children objects.");
         }
 
         this._visibleObjects = visibleObjects??container.length-1;
         this.moveAmount = moveAmount??10;
         this._isMoving = isMoving??false;
+        this.isActive = isMoving??false;
         this._axis=axis??AXIS.Vertical;
         this._dim = dim??100;
 
@@ -82,8 +83,23 @@ export class MovingColumn implements GameObjects{
         this._container.addChild(...this.children);
     }
 
-    animate(delta:number):void{
+    start(){
+        this.isActive = true;
+        this._isMoving = true;
+    }
+
+    stop(){
+        this.isActive = false;
+        this._isMoving = false;
+    }
+
+    frame(delta:number):void{
+
         this._align();
+
+        if (!this.isActive){
+            return;
+        }
 
         // Since all elements are based on the position of the first, we just need to move the first,
         // then the rest of the childnre follow.
@@ -99,7 +115,7 @@ export class MovingColumn implements GameObjects{
             // for example, we can move the last item that went off screen to the
             // top of the container. Or we can completley generate a new object to
             // place at the top and delete the one that went off screen.
-            // TODO: Add a factory class that creates MovableColumns
+            // TODO: Add a factory class that creates [Slot]s
                 // MovableColumns.NextRandom
                 // MoveableComuns.DefinedList 
 
@@ -123,6 +139,10 @@ export class MovingColumn implements GameObjects{
             last.setTransform(this.children[0].transform.position.x-this._dim,0,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }
+
+        // Means we reached the end of screen.
+        // Here we can make checks to see if we should stop.
+
     }
 
     private _align(){
@@ -135,11 +155,6 @@ export class MovingColumn implements GameObjects{
                 this.children[next].transform.position.y = this.children[prev].transform.position.y + this.children[prev].getBounds().height;
             }
         }
-    }
-
-    // Behavior:
-    onClick(){
-        this._isMoving = !this._isMoving;
     }
 
     getRenderable():PIXI.DisplayObject{

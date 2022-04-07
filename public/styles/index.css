@@ -1,0 +1,23 @@
+body{
+    background-color: lightgray;
+}
+
+canvas{
+   width:auto;
+   display: block;
+   position: absolute;
+   top:50%;
+   left: 50%;
+   transform: translate(-50%,-50%);
+   padding:10px;
+}
+
+
+@media screen and (max-width:500px) {
+    canvas{
+        margin:auto;
+        width:100vw;
+        height:auto;
+        display: block;
+    }
+}

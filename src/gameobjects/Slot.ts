@@ -8,7 +8,7 @@ export enum TargetType{
 
 export class Slot implements GameObjects{
 
-    public children:PIXI.DisplayObject[];
+    public children:PIXI.Sprite[];
     public child:PIXI.Container;
     private moveAmount:number;
     private _isMoving:boolean;
@@ -16,34 +16,44 @@ export class Slot implements GameObjects{
     private _container:PIXI.Container;
 
     private _size:number;
-    private _visibleObjects:number;
+    public visibleObjects:number;
+
+    private _textures:PIXI.Texture[];
 
     isActive: boolean;
 
-    constructor(container:PIXI.Texture[],
+    targets:PIXI.Texture[];
+    private alignTargets:boolean;
+    private alignTargetIndex:number;
+
+    constructor(textures:PIXI.Texture[],
         visibleObjects:number=3,
         dim?:number,
         axis?:AXIS,
         moveAmount?:number){
 
-        this._visibleObjects = visibleObjects??container.length-1;
+        this.visibleObjects = visibleObjects;
         this.moveAmount = moveAmount??10;
         this._isMoving = false;
         this.isActive = false;
         this._axis=axis??AXIS.Vertical;
         this._size = dim??100;
-
+        this._textures = textures;
         this._container = new PIXI.Container();
         this.child = this._container;
+
+        this.targets = []
+        this.alignTargets = false;
+        this.alignTargetIndex = 0;
            
         // Create a Mask to hide off-screen elements of the slider
         let borderMask = new PIXI.Container();
         let g = new PIXI.Graphics();
         g.beginFill(0xff0000);
         if (this._axis === AXIS.Vertical){
-            g.drawRect(0,0,this._size,this._visibleObjects*this._size);
+            g.drawRect(0,0,this._size,this.visibleObjects*this._size);
         }else{
-            g.drawRect(0,0,this._visibleObjects*this._size,this._size);
+            g.drawRect(0,0,this.visibleObjects*this._size,this._size);
         }
         borderMask.addChild(g);
         this._container.addChild(borderMask);
@@ -54,41 +64,58 @@ export class Slot implements GameObjects{
         let g2 = new PIXI.Graphics();
         g2.beginFill(0x0000ff);
         if (this._axis === AXIS.Vertical){
-            g2.drawRect(0,0,this._size,this._visibleObjects*this._size);
+            g2.drawRect(0,0,this._size,this.visibleObjects*this._size);
         }else{
-            g2.drawRect(0,0,this._visibleObjects*this._size,this._size);
+            g2.drawRect(0,0,this.visibleObjects*this._size,this._size);
         }
         border.addChild(g2);
         this.child.addChild(border);
 
-        // Create sprites out of the textures
-        this.children = [];
-        this.children.push(...container.flatMap((c)=>{
-            let sprt = new PIXI.Sprite(c);
-            sprt.width = this._size;
-            sprt.height = this._size;
-            return sprt;
-        }));    
+        
+        this.children = []
+
+        while(this._textures.length < visibleObjects+1){
+            this._textures.push(textures[Math.floor(Math.random()*textures.length)]);
+        }
+
+        // TODO: don't add each, add just enough and then choose randomly., 
+        this.children.push(...textures.flatMap((tex)=>{
+            let spr = new PIXI.Sprite(tex);
+            spr.width = this._size;
+            spr.height = this._size;
+            return spr;
+        }));
+
         this._container.addChild(...this.children);
+        this._align();
     }
 
-    start(){
+    start(target?:PIXI.Texture[]){
+
+        if (target != undefined && target.length != 0){
+            this.targets = target;
+            this.alignTargetIndex = target.length-1;
+        }
+
         this.isActive = true;
         this._isMoving = true;
     }
 
     stop(){
-        this.isActive = false;
-        this._isMoving = false;
+        if (this.targets != undefined && this.targets.length != 0){
+            this.alignTargets = true;
+        }else{
+            this._isMoving = false;
+        }
     }
 
     frame(delta:number):void{
 
-        this._align();
-
         if (!this.isActive){
             return;
         }
+
+        this._align();
 
         // Since all elements are based on the position of the first, we just need to move the first,
         // then the rest of the childnre follow.
@@ -108,30 +135,42 @@ export class Slot implements GameObjects{
                 // MovableColumns.NextRandom
                 // MoveableComuns.DefinedList 
 
-            if(this.children[this.children.length-1].transform.position.y > this._visibleObjects*this._size){
+            if(this.children[this.children.length-1].transform.position.y > this.visibleObjects*this._size){
                 this.shift()
-            }else if(this.children[this.children.length-1].transform.position.x > this._visibleObjects*this._size){
+            }else if(this.children[this.children.length-1].transform.position.x > this.visibleObjects*this._size){
                 this.shift()
             }
         }   
     }
 
     private shift(){
+        let last = this.children[this.children.length-1]
         if (this._axis === AXIS.Vertical){
-            let last = this.children[this.children.length-1]
             this.children.pop();
             last.setTransform(0,this.children[0].transform.position.y-this._size,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }else{
-            let last = this.children[this.children.length-1]
             this.children.pop();
             last.setTransform(this.children[0].transform.position.x-this._size,0,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }
+        // The next on the [Slot] reel must be something random.
 
-        // Means we reached the end of screen.
-        // Here we can make checks to see if we should stop.
-
+        // If we have targets, then we should be able specify those and have our [Slot] reel
+        // stop on those targets. We shall [shift()] them in one at a time and then stop the reel.
+        if (this.targets != undefined && this.targets.length != 0 && this.alignTargets){
+            console.log("herre");
+            last.texture = this.targets[this.alignTargetIndex];
+            this.alignTargetIndex-=1;
+            if(this.alignTargetIndex < 0){
+                this._isMoving = false;
+                this.alignTargets = false;
+                this.alignTargetIndex=this.targets.length-1;
+            }
+        }else{
+            console.log("herre");
+            last.texture = this._textures[Math.floor(Math.random()*this._textures.length)];
+        }
     }
 
     private _align(){
@@ -146,7 +185,7 @@ export class Slot implements GameObjects{
         }
     }
 
-    getRenderable():PIXI.DisplayObject{
+    getRenderable():PIXI.Container{
         return this.child;
     }
 

@@ -60,6 +60,7 @@ export class Lever implements GameObject{
 
     addActivateBehavior(action:Function){
         this.child.addListener("click", ()=>{this.onClick(action)});
+        this.child.addListener("touchstart", ()=>{this.onClick(action)});
     }
     
     //TODO: chagne

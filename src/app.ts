@@ -1,3 +1,4 @@
+import {FroggerType} from "./prizetables/froggertable/frogger";
 import {GameObject, AXIS} from "./gameobjects/GameObject";
 import {SlotMachine} from "./gameobjects/SlotMachine";
 import {Renderer} from './renderer/renderer';
@@ -66,8 +67,11 @@ export class App{
     let water = this._loader.resources[waterTextureName].texture;
     let rock = this._loader.resources[rockTextureName].texture;
     let lilly = this._loader.resources[lillyPadTextureName].texture;
-    // Create [Symbol]s from the textures.
-    let waterSymbol:Symbol<> =
+    // // Create [Symbol]s from the textures.
+    // let waterSymbol:Symbol<FroggerType> = new Symbol(water,FroggerType.WATER);
+    // let rockSymbol:Symbol<FroggerType> = new Symbol(rock,FroggerType.ROCK);
+    // let lillySymbol:Symbol<FroggerType> = new Symbol(lilly,FroggerType.LILLY);
+
 
 
     // Create [Slot]s
@@ -75,20 +79,31 @@ export class App{
     let slots:Slot[] = [];
     let amountOfSlots:number = 5;
     for(let i=0;i<amountOfSlots;i++){
-      slots.push(new Slot([water,lilly,rock],3,size,AXIS.Vertical,App.SPEED));
+      slots.push(new Slot([water,rock,lilly],3,size,AXIS.Vertical,App.SPEED));
     }   
      
     let leverRadius = size/2;
     let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
+
+    // For testing purposes
+    let col1Target:PIXI.Texture[] = [rock,water,water];
+    let col2Target:PIXI.Texture[] = [rock,water,water];
+    let col3Target:PIXI.Texture[] = [rock,water,water];
+    let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
+    let col5Target:PIXI.Texture[] = [rock,water,water];
+    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
+
     let slot = new SlotMachine(lever,[...slots]);
     
     lever.addActivateBehavior(async ()=>{
-      await slot.start();
+      await slot.start(colTargs);
       await slot.stop();
     });
     
     this._gameObjects.set("SlotMachine", slot);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
+
+
 
     // Start Game Loop
     // In order to use the gameLoop callback, we must pass through

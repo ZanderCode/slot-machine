@@ -1,7 +1,6 @@
 import {GameObjects, AXIS} from "./GameObject";
 import {Lever} from "./Lever";
 import {Slot} from "./Slot";
-import {Symbol} from "./Symbol";
 import * as PIXI from 'pixi.js';
 
 
@@ -23,7 +22,7 @@ export class SlotMachine implements GameObjects{
     isActive: boolean;
     axis: AXIS;
 
-    private slotState:SlotStates;
+    public slotState:SlotStates;
     private targets:Array<PIXI.Texture[]>;
 
     constructor(lever:Lever,slots:Slot[],targets?:Array<PIXI.Texture[]>){
@@ -86,15 +85,23 @@ export class SlotMachine implements GameObjects{
         }
     }
 
-    async stop():Promise<Symbol<any>[]>{
+    async stop(){
         this.slotState = SlotStates.STOPPING;
         for (let i=0;i<this._slots.length;i++){
             this._slots[i].stop();
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         this.slotState = SlotStates.PRIZE;
-        return [];
-        
+    }
+
+    public getResult():Array<PIXI.Texture[]>{
+        let texturesMatrix:Array<PIXI.Texture[]> = [];
+        for (let i=0;i<this._slots.length;i++){
+            let slot:Slot = this._slots[i]; 
+            let sprites:PIXI.Sprite[] = slot.children.slice(1,slot.visibleObjects+1)
+            texturesMatrix.push([...sprites.flatMap(s=>s.texture)]);
+        }
+        return texturesMatrix;
     }
 
     frame(delta:number):void{

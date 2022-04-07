@@ -1,5 +1,5 @@
 import {GameObject, AXIS} from "../gameobjects/GameObject";
-import {SlotMachine} from "../gameobjects/SlotMachine";
+import {SlotMachine, SlotStates} from "../gameobjects/SlotMachine";
 import {Renderer} from '../renderer/renderer';
 import {Lever} from '../gameobjects/Lever';
 import {Slot} from "../gameobjects/Slot";
@@ -15,6 +15,13 @@ class DataResource{
     this.name = name;
     this.path = path;
   }
+}
+
+
+export enum FroggerType{
+  WATER,
+  LILLY,
+  ROCK
 }
 
 // Main app:
@@ -84,7 +91,7 @@ export class App{
     let col5Target:PIXI.Texture[] = [rock,lilly,water];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
-    let slot = new SlotMachine(lever,[...slots],colTargs);
+    let slot = new SlotMachine(lever,[...slots]);
     
     lever.addActivateBehavior(async ()=>{
       await slot.start();
@@ -93,7 +100,6 @@ export class App{
     
     this._gameObjects.set("SlotMachine", slot);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
-
 
 
     // Start Game Loop
@@ -107,8 +113,19 @@ export class App{
   // Game Logic and state management
   // States = Idle, Rolling, Stopping, Prize
   gameLoop(delta:number,gameObjects:Map<string,GameObject>){
+    
     gameObjects.forEach(go => {
       go.frame(delta);
     });
+
+    let slotMachine = gameObjects.get("SlotMachine") as SlotMachine;
+    if (slotMachine.slotState === SlotStates.PRIZE){
+      // What happens when the slot finally stopped?
+      // Lets check the results and change state back to IDLE
+      slotMachine.slotState = SlotStates.IDLE;
+      let textureMaxtrix:Array<PIXI.Texture[]> = slotMachine.getResult();
+      console.log(textureMaxtrix);
+    }
   }
+  
 }

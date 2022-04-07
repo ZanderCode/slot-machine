@@ -1,11 +1,6 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
 
-export enum TargetType{
-    Random,
-    Normal
-}
-
 export class Slot implements GameObjects{
 
     public children:PIXI.Sprite[];

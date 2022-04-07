@@ -3,8 +3,11 @@ import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 
 // Create the skills assessment app
-///@ts-nocheck
-const app = new App();
+window.onload = () =>{
+    let canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    const app = new App(canvas);
+}
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

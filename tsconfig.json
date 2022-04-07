@@ -1,4 +1,4 @@
-{
+{  
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -18,9 +18,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
   },
   "include": [
-    "src"
-,   "public/assets"  ]
+    "src",   
+    "public/assets"
+  ],
 }

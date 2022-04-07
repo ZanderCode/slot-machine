@@ -4,14 +4,15 @@ import { GameObject } from "../gameobjects/GameObject"
 export class Renderer{
   private _application: PIXI.Application; 
 
-  constructor() {
+  constructor(canvas:HTMLCanvasElement) {
     this._application = new PIXI.Application({
       backgroundColor: 0x333333,
       height:300,
+      view:canvas,
       autoStart:true,
     });
 
-    document.body.appendChild(this._application.view);
+    document.body.prepend(this._application.view);
   }
 
   // Exposes stage to App

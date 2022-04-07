@@ -31,8 +31,8 @@ export class App{
 
   private static SPEED:number = 10;
 
-  public constructor() {
-    this._renderer = new Renderer();
+  public constructor(canvas:HTMLCanvasElement) {
+    this._renderer = new Renderer(canvas);
     this._dataResources = [];
     this._gameObjects = new Map<string,GameObject>();     
 

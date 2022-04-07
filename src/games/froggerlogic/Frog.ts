@@ -13,19 +13,124 @@ export class Frog implements GameObject{
         this.child.height = size;
     }
 
-    async followPath(matrix:Array<PIXI.Sprite[]>,walkableTextures:PIXI.Texture){
-        for(let col=0; col<matrix.length;col++){
-            for(let row=0; col<matrix[col].length;row++){
-                if (matrix[col][row].texture === walkableTextures){
-                    this.child.transform.position.y = matrix[col][row].transform.position.y;
-                    this.child.transform.position.x = matrix[col][row].getBounds().x;
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    break;
-                }
-            }
+    async followPath(matrix:Array<PIXI.Sprite[]>,walkableTextures:PIXI.Texture):Promise<boolean>{
+
+
+        let path = this.getPath(matrix,walkableTextures);
+        if (path.length == 0) return false;
+
+        for(let i=0; i<path.length;i++){
+            let spr = path[i];
+            this.child.transform.position.y = spr.transform.position.y;
+            this.child.transform.position.x = spr.getBounds().x;
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        //await new Promise(resolve => setTimeout(resolve, 500));
+        return true;
+
+        // for(let col=0; col<matrix.length;col++){
+        //     let foundInColumn:boolean=false;
+        //     for(let row=0; row<matrix[col].length;row++){
+        //         if (matrix[col][row].texture === walkableTextures){
+        //             this.child.transform.position.y = matrix[col][row].transform.position.y;
+        //             this.child.transform.position.x = matrix[col][row].getBounds().x;
+        //             await new Promise(resolve => setTimeout(resolve, 200));
+        //             foundInColumn = true;
+        //             break;
+        //         }
+        //     }
+        //     if (!foundInColumn){
+        //         //reset to beginning
+        //         this.child.transform.position.y = matrix[0][1].transform.position.y;
+        //         this.child.transform.position.x = matrix[0][1].getBounds().x;
+        //         return;
+        //     }
+        // }
+    }
+
+    getPath(matrix:Array<PIXI.Sprite[]>,walkable:PIXI.Texture):PIXI.Sprite[]{
+
+        let path:PIXI.Sprite[] = [];
+
+        // start at beginning: first column
+        // check if lilly pad
+        // if not return no path
+        // if so then recurse and find longest path
+
+        // movements: up, down, forward
+        // check all direction
+        // if path found
+        // if standing on last space, then return path.
+        // if next space is equal to the previous space, then return path.
+        // if no spaces to traverse, then return path;
+
+        // First find if there is a starting point,
+        // if not, then return no path, otherwise,
+        // start path finding.
+        let hasStart:boolean = false;
+        let row:number = 0;
+        for (let i=0; i < matrix[0].length;i++){
+            if (matrix[0][i].texture === walkable){
+                hasStart = true;
+                path.push(matrix[0][i]);
+                row = i;
+                break;
+            }
+        } 
+
+        // Has a start point, keep going until no more or path found.
+        if (hasStart){
+            path = this.recursivePath(matrix,path,row,0,walkable);
+        }
+
+        if (matrix[matrix.length-1].includes(path[path.length-1])){return path}
+        return [];
+    }
+
+    recursivePath(matrix:Array<PIXI.Sprite[]>,path:PIXI.Sprite[],row:number,col:number,target:PIXI.Texture):PIXI.Sprite[]{
+
+        // return path if its the frog is in the last column
+        if (matrix[matrix.length-1].includes(path[path.length-1])){return path}
+
+        let above:PIXI.Sprite = undefined;
+        let below:PIXI.Sprite = undefined;
+        let forward:PIXI.Sprite = undefined;
+
+        // Find the next path to take:
+
+        if (row+1 <= matrix[col].length-1){ // below
+            if (!path.includes(matrix[col][row+1])){ // should not be the previous path
+                if (matrix[col][row+1].texture == target){
+                    below = matrix[col][row+1];
+                }
+            } 
+        } 
+        if (row-1 >= 0){ // above
+            if (!path.includes(matrix[col][row-1])){ // should not be the previous path
+                if (matrix[col][row-1].texture == target){
+                    above = matrix[col][row-1];
+                }
+            } 
+        }                    
+        if (col+1 <= matrix.length-1){ // forward
+            if (matrix[col+1][row].texture == target){
+                forward = matrix[col+1][row];
+            }
+        }      
+
+        if (above !== undefined) {
+            return this.recursivePath(matrix,[...path, above],row-1,col,target);
+        }
+        if (below !== undefined) {
+            return this.recursivePath(matrix,[...path, below],row+1,col,target);
+        }
+        // Recurse with new paths
+        if (forward !== undefined) {
+            return this.recursivePath(matrix,[...path, forward],row,col+1,target);
+        }
+
+
+        return []; // no last column.... failed
     }
 
     frame(delta:number){

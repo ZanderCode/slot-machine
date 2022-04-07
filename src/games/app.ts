@@ -94,13 +94,13 @@ export class App{
 
     // For testing purposes
     let col1Target:PIXI.Texture[] = [lilly,water,water];
-    let col2Target:PIXI.Texture[] = [rock,water,water];
-    let col3Target:PIXI.Texture[] = [rock,water,lilly];
-    let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col5Target:PIXI.Texture[] = [rock,lilly,water];
+    let col2Target:PIXI.Texture[] = [lilly,water,water];
+    let col3Target:PIXI.Texture[] = [lilly,lilly,lilly];
+    let col4Target:PIXI.Texture[] = [lilly,water,lilly];
+    let col5Target:PIXI.Texture[] = [water,water,lilly];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
-    let slot = new SlotMachine(lever,[...slots]);
+    let slot = new SlotMachine(lever,[...slots],colTargs);
     
     lever.addActivateBehavior(async ()=>{
       await slot.start();
@@ -147,8 +147,8 @@ export class App{
       // Deactivate all moving parts like lever, slots, etc.
       // Activate frog to move
       let frog = gameObjects.get("Frog") as Frog;
-      frog.followPath(spriteMatrix,textures.get("lilly")).then(()=>{
-        // Frog done path reset state of all other objects
+      frog.followPath(spriteMatrix,textures.get("lilly")).then((success)=>{
+        console.log(success);
       });
     }
   }

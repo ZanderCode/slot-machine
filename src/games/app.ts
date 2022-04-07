@@ -91,7 +91,7 @@ export class App{
     let col5Target:PIXI.Texture[] = [rock,lilly,water];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
-    let slot = new SlotMachine(lever,[...slots]);
+    let slot = new SlotMachine(lever,[...slots],colTargs);
     
     lever.addActivateBehavior(async ()=>{
       await slot.start();

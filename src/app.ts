@@ -90,7 +90,7 @@ export class App{
     let col2Target:PIXI.Texture[] = [rock,water,water];
     let col3Target:PIXI.Texture[] = [rock,water,water];
     let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col5Target:PIXI.Texture[] = [rock,water,water];
+    let col5Target:PIXI.Texture[] = [rock,lilly,water];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
     let slot = new SlotMachine(lever,[...slots]);

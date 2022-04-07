@@ -1,5 +1,7 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
+import { isMappedTypeNode } from "typescript";
+import { runInThisContext } from "vm";
 
 export enum TargetType{
     Random,
@@ -25,6 +27,7 @@ export class Slot implements GameObjects{
     targets:PIXI.Texture[];
     private alignTargets:boolean;
     private alignTargetIndex:number;
+    private aligned:boolean;
 
     constructor(textures:PIXI.Texture[],
         visibleObjects:number=3,
@@ -45,6 +48,7 @@ export class Slot implements GameObjects{
         this.targets = []
         this.alignTargets = false;
         this.alignTargetIndex = 0;
+        this.aligned = false;
            
         // Create a Mask to hide off-screen elements of the slider
         let borderMask = new PIXI.Container();
@@ -106,6 +110,7 @@ export class Slot implements GameObjects{
             this.alignTargets = true;
         }else{
             this._isMoving = false;
+            this._align(true);
         }
     }
 
@@ -135,9 +140,13 @@ export class Slot implements GameObjects{
                 // MovableColumns.NextRandom
                 // MoveableComuns.DefinedList 
 
-            if(this.children[this.children.length-1].transform.position.y > this.visibleObjects*this._size){
-                this.shift()
-            }else if(this.children[this.children.length-1].transform.position.x > this.visibleObjects*this._size){
+            if((this.children[this.children.length-1].transform.position.y > this.visibleObjects*this._size) || 
+            (this.children[this.children.length-1].transform.position.x > this.visibleObjects*this._size)){
+                if (this.aligned){
+                    this._isMoving = false;
+                    this.aligned = false;
+                    this._align(true);
+                }
                 this.shift()
             }
         }   
@@ -159,26 +168,31 @@ export class Slot implements GameObjects{
         // If we have targets, then we should be able specify those and have our [Slot] reel
         // stop on those targets. We shall [shift()] them in one at a time and then stop the reel.
         if (this.targets != undefined && this.targets.length != 0 && this.alignTargets){
-            console.log("herre");
             last.texture = this.targets[this.alignTargetIndex];
             this.alignTargetIndex-=1;
-            if(this.alignTargetIndex < 0){
-                this._isMoving = false;
-                this.alignTargets = false;
+            if(this.alignTargetIndex < 0 && this.alignTargets){
                 this.alignTargetIndex=this.targets.length-1;
+                this.alignTargets = false;
+                this.aligned = true;
             }
         }else{
-            console.log("herre");
             last.texture = this._textures[Math.floor(Math.random()*this._textures.length)];
         }
     }
 
-    private _align(){
+    private _align(once?:boolean){
+        
         if (this._axis === AXIS.Horizontal){
+            if (once){
+                this.children[0].transform.position.x = 0;
+            }
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
                 this.children[next].transform.position.x = this.children[prev].transform.position.x + this.children[prev].getBounds().width;
             }
         }else if(this._axis === AXIS.Vertical){ 
+            if (once){
+                this.children[0].transform.position.y = 0;
+            }
             for(let prev = 0,next = 1; next<this.children.length;next++,prev++){
                 this.children[next].transform.position.y = this.children[prev].transform.position.y + this.children[prev].getBounds().height;
             }

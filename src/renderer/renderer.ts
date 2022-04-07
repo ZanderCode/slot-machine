@@ -1,14 +1,13 @@
 import * as PIXI from 'pixi.js';
 import { GameObject } from "../gameobjects/GameObject"
 
-export class Renderer {
+export class Renderer{
   private _application: PIXI.Application; 
 
-  public constructor() {
-
+  constructor() {
     this._application = new PIXI.Application({
       backgroundColor: 0x333333,
-      autoStart: true,
+      autoStart:true,
     });
 
     document.body.appendChild(this._application.view);

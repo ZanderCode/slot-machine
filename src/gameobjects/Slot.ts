@@ -15,46 +15,35 @@ export class Slot implements GameObjects{
     private _axis:AXIS;
     private _container:PIXI.Container;
 
-    private _dim:number;
+    private _size:number;
     private _visibleObjects:number;
 
     isActive: boolean;
 
     constructor(container:PIXI.Texture[],
-        isMoving?:boolean,
         visibleObjects:number=3,
         dim?:number,
         axis?:AXIS,
         moveAmount?:number){
 
-
-        if (container.length < 2){
-            console.error("The number of elements in a Slot Object should be 2 or more.");
-        }
-
-        if (visibleObjects??container.length-1 >= container.length){
-            console.error("The number of visible objects must be at least 1 less than the total number of children objects.");
-        }
-
         this._visibleObjects = visibleObjects??container.length-1;
         this.moveAmount = moveAmount??10;
-        this._isMoving = isMoving??false;
-        this.isActive = isMoving??false;
+        this._isMoving = false;
+        this.isActive = false;
         this._axis=axis??AXIS.Vertical;
-        this._dim = dim??100;
+        this._size = dim??100;
 
         this._container = new PIXI.Container();
         this.child = this._container;
            
-
         // Create a Mask to hide off-screen elements of the slider
         let borderMask = new PIXI.Container();
         let g = new PIXI.Graphics();
         g.beginFill(0xff0000);
         if (this._axis === AXIS.Vertical){
-            g.drawRect(0,0,this._dim,this._visibleObjects*this._dim);
+            g.drawRect(0,0,this._size,this._visibleObjects*this._size);
         }else{
-            g.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
+            g.drawRect(0,0,this._visibleObjects*this._size,this._size);
         }
         borderMask.addChild(g);
         this._container.addChild(borderMask);
@@ -65,9 +54,9 @@ export class Slot implements GameObjects{
         let g2 = new PIXI.Graphics();
         g2.beginFill(0x0000ff);
         if (this._axis === AXIS.Vertical){
-            g2.drawRect(0,0,this._dim,this._visibleObjects*this._dim);
+            g2.drawRect(0,0,this._size,this._visibleObjects*this._size);
         }else{
-            g2.drawRect(0,0,this._visibleObjects*this._dim,this._dim);
+            g2.drawRect(0,0,this._visibleObjects*this._size,this._size);
         }
         border.addChild(g2);
         this.child.addChild(border);
@@ -76,10 +65,10 @@ export class Slot implements GameObjects{
         this.children = [];
         this.children.push(...container.flatMap((c)=>{
             let sprt = new PIXI.Sprite(c);
-            sprt.width = this._dim;
-            sprt.height = this._dim;
+            sprt.width = this._size;
+            sprt.height = this._size;
             return sprt;
-        }))     
+        }));    
         this._container.addChild(...this.children);
     }
 
@@ -119,9 +108,9 @@ export class Slot implements GameObjects{
                 // MovableColumns.NextRandom
                 // MoveableComuns.DefinedList 
 
-            if(this.children[this.children.length-1].transform.position.y > this._visibleObjects*this._dim){
+            if(this.children[this.children.length-1].transform.position.y > this._visibleObjects*this._size){
                 this.shift()
-            }else if(this.children[this.children.length-1].transform.position.x > this._visibleObjects*this._dim){
+            }else if(this.children[this.children.length-1].transform.position.x > this._visibleObjects*this._size){
                 this.shift()
             }
         }   
@@ -131,12 +120,12 @@ export class Slot implements GameObjects{
         if (this._axis === AXIS.Vertical){
             let last = this.children[this.children.length-1]
             this.children.pop();
-            last.setTransform(0,this.children[0].transform.position.y-this._dim,last.scale.x,last.scale.y);
+            last.setTransform(0,this.children[0].transform.position.y-this._size,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }else{
             let last = this.children[this.children.length-1]
             this.children.pop();
-            last.setTransform(this.children[0].transform.position.x-this._dim,0,last.scale.x,last.scale.y);
+            last.setTransform(this.children[0].transform.position.x-this._size,0,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }
 

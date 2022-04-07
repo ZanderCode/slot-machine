@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js';
 export class SlotMachine implements GameObjects{
 
     children: PIXI.DisplayObject[];
-    child:PIXI.DisplayObject;
+    child:PIXI.Container;
 
     private _slots:Slot[]
     private _lever:Lever;
@@ -18,11 +18,22 @@ export class SlotMachine implements GameObjects{
     constructor(lever:Lever,slots:Slot[]){
         this.children = [];
         this.child = new PIXI.Container();
-
         this.axis = AXIS.Vertical;
 
         this._slots = slots;
         this._lever = lever;
+
+
+        // Add the [Slot]s as children of the [SlotMachine]
+        // Add the [Lever] as a chuld of the [SlotMachine]
+        // Also move them into place.
+        let prev:number = 0;
+        for(let slotIndex = 0; slotIndex < slots.length; slotIndex++){
+            slots[slotIndex].getRenderable().transform.position.x = prev;
+            prev += slots[slotIndex].getRenderable().getBounds().width;
+            this.child.addChild(slots[slotIndex].getRenderable());
+        }
+        this.child.addChild(lever.getRenderable());
 
         this.isActive = false;
     }
@@ -43,7 +54,8 @@ export class SlotMachine implements GameObjects{
     }
 
     frame(delta:number):void{
-        return;
+        this._slots.forEach(s=>s.frame(delta));
+        this._lever.frame(delta);
     }
 
     getRenderable():PIXI.DisplayObject{

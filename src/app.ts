@@ -1,11 +1,10 @@
-import { Renderer } from './renderer/renderer';
 import {GameObject, AXIS} from "./gameobjects/GameObject";
 import {SlotMachine} from "./gameobjects/SlotMachine";
+import {Renderer} from './renderer/renderer';
+import {Symbol} from "./gameobjects/Symbol"
+import {Lever} from './gameobjects/Lever';
 import {Slot} from "./gameobjects/Slot";
-import {Symbol} from "./gameobjects/Symbol";
 import * as PIXI from "pixi.js";
-import { Lever } from './gameobjects/Lever';
-import { TetrisTypes } from './TetrisTypes';
 
 // Helper for managing data and starting
 // Asset and GameObject creation during
@@ -23,13 +22,15 @@ class DataResource{
 // - Loads assets
 // - Creates [GameObject]s
 // - Starts game loop
-export class App {
+export class App{
   private _renderer: Renderer;
   private _loader:PIXI.Loader;
 
   //_sprite:string refers to _dataResources.name
   private _dataResources:DataResource[];
   private _gameObjects:Map<string,GameObject>;
+
+  private static SPEED:number = 10;
 
   public constructor() {
     this._renderer = new Renderer();
@@ -39,9 +40,9 @@ export class App {
     // Load Assets, Create Game Objects
     this._loader = PIXI.Loader.shared;
     this._loader.baseUrl = "assets/";
-
-    this.addDataResource("ball","test.png");
-    this.addDataResource("ball1","test1.png");
+    this.addDataResource("water","water.png");
+    this.addDataResource("rock","rock.png");
+    this.addDataResource("lilly","lilly.png");
 
     this._loader.onComplete.add(()=>this.createGameObjects(true));
     this._loader.load();
@@ -57,44 +58,36 @@ export class App {
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
     
-    // Create GameObject and other renderables.
-    let tex1Name = this._dataResources[0].name;
-    let tex2Name = this._dataResources[1].name;
-    let tex1 = this._loader.resources[tex1Name].texture;
-    let tex2 = this._loader.resources[tex2Name].texture;
-    let dim:number = 100;
+    // Create [GameObject]s and other renderables.
+    let waterTextureName = this._dataResources[0].name;
+    let rockTextureName = this._dataResources[1].name;
+    let lillyPadTextureName = this._dataResources[2].name;
+    // Grab the textures from the resources
+    let water = this._loader.resources[waterTextureName].texture;
+    let rock = this._loader.resources[rockTextureName].texture;
+    let lilly = this._loader.resources[lillyPadTextureName].texture;
+    // Create [Symbol]s from the textures.
+    let waterSymbol:Symbol<> =
 
-    let moving = new Slot([tex1,tex2,tex1,tex2,tex1,tex2,tex1],false,3,dim,AXIS.Vertical,10);
-    let moving2 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
-    let moving3 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
-    let moving4 = new Slot([tex2,tex1,tex2,tex1,tex2,tex1,tex2],false,3,dim,AXIS.Vertical,10);
-    moving2.child.position.x = dim;
-    moving3.child.position.x = dim*2;
-    moving4.child.position.x = dim*3;
 
-    let L = new Symbol<TetrisTypes>(tex1,TetrisTypes.L);
-    let J = new Symbol<TetrisTypes>(tex1,TetrisTypes.J);
-    let S = new Symbol<TetrisTypes>(tex1,TetrisTypes.S);
-    let Z = new Symbol<TetrisTypes>(tex1,TetrisTypes.Z);
-    let O = new Symbol<TetrisTypes>(tex1,TetrisTypes.O);
-    let T = new Symbol<TetrisTypes>(tex1,TetrisTypes.T);
-    let I = new Symbol<TetrisTypes>(tex1,TetrisTypes.I);
+    // Create [Slot]s
+    let size:number = 100;
+    let slots:Slot[] = [];
+    let amountOfSlots:number = 5;
+    for(let i=0;i<amountOfSlots;i++){
+      slots.push(new Slot([water,lilly,rock],3,size,AXIS.Vertical,App.SPEED));
+    }   
+     
+    let leverRadius = size/2;
+    let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
+    let slot = new SlotMachine(lever,[...slots]);
     
-    let leverRadius = dim/2;
-    let lever = new Lever(dim*4+leverRadius,leverRadius,leverRadius,(dim*3)-(leverRadius*2));
-    let slot = new SlotMachine(lever,[moving,moving2,moving3,moving4]);
     lever.addActivateBehavior(async ()=>{
       await slot.start();
       await slot.stop();
     });
     
-    // Stage All
-    this._gameObjects.set("Slot1",moving);
-    this._gameObjects.set("Slot2",moving2);
-    this._gameObjects.set("Slot3",moving3);
-    this._gameObjects.set("Slot4",moving4);
-    this._gameObjects.set("Lever",lever);
-    this._gameObjects.set("SlotMachine",slot);
+    this._gameObjects.set("SlotMachine", slot);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
 
     // Start Game Loop
@@ -112,5 +105,4 @@ export class App {
       go.frame(delta);
     });
   }
-
 }

@@ -94,19 +94,20 @@ export class SlotMachine implements GameObjects{
         this.slotState = SlotStates.PRIZE;
     }
 
-    public getResult():Array<PIXI.Texture[]>{
-        let texturesMatrix:Array<PIXI.Texture[]> = [];
+    public getResult():Array<PIXI.Sprite[]>{
+        let texturesMatrix:Array<PIXI.Sprite[]> = [];
         for (let i=0;i<this._slots.length;i++){
             let slot:Slot = this._slots[i]; 
             let sprites:PIXI.Sprite[] = slot.children.slice(1,slot.visibleObjects+1)
-            texturesMatrix.push([...sprites.flatMap(s=>s.texture)]);
+            texturesMatrix.push(sprites);
         }
         return texturesMatrix;
     }
 
     frame(delta:number):void{
-        this._slots.forEach(s=>s.frame(delta));
-        this._lever.frame(delta);
+        if (this.isActive){
+            
+        }
     }
 
     getRenderable():PIXI.DisplayObject{

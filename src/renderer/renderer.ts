@@ -21,8 +21,8 @@ export class Renderer{
   }
 
   // Exposes the application ticker to allow for custom loops
-  loop(gameLoop:Function,gameObjects:Map<string,GameObject>){
-    this._application.ticker.add((delta)=>gameLoop(delta,gameObjects));
+  loop(gameLoop:Function,gameObjects:Map<string,GameObject>,textures:Map<string,PIXI.Texture>){
+    this._application.ticker.add((delta)=>gameLoop(delta,gameObjects,textures));
   }
 }
 

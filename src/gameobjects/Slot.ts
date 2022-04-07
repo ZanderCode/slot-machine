@@ -1,7 +1,5 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
-import { isMappedTypeNode } from "typescript";
-import { runInThisContext } from "vm";
 
 export enum TargetType{
     Random,
@@ -82,7 +80,7 @@ export class Slot implements GameObjects{
             this._textures.push(textures[Math.floor(Math.random()*textures.length)]);
         }
 
-        // TODO: don't add each, add just enough and then choose randomly., 
+        
         this.children.push(...textures.flatMap((tex)=>{
             let spr = new PIXI.Sprite(tex);
             spr.width = this._size;
@@ -96,7 +94,7 @@ export class Slot implements GameObjects{
 
     start(target?:PIXI.Texture[]){
 
-        if (target != undefined && target.length != 0){
+        if (target !== undefined && target.length !== 0){
             this.targets = target;
             this.alignTargetIndex = target.length-1;
         }
@@ -106,11 +104,11 @@ export class Slot implements GameObjects{
     }
 
     stop(){
-        if (this.targets != undefined && this.targets.length != 0){
+        if (this.targets !== undefined && this.targets.length !== 0){
             this.alignTargets = true;
         }else{
-            this._isMoving = false;
-            this._align(true);
+            this.aligned = true;
+            this._align();
         }
     }
 
@@ -167,7 +165,7 @@ export class Slot implements GameObjects{
 
         // If we have targets, then we should be able specify those and have our [Slot] reel
         // stop on those targets. We shall [shift()] them in one at a time and then stop the reel.
-        if (this.targets != undefined && this.targets.length != 0 && this.alignTargets){
+        if (this.targets !== undefined && this.targets.length !== 0 && this.alignTargets){
             last.texture = this.targets[this.alignTargetIndex];
             this.alignTargetIndex-=1;
             if(this.alignTargetIndex < 0 && this.alignTargets){

@@ -1,4 +1,4 @@
-import {GameObjects, GameObject, AXIS} from "./GameObject";
+import {GameObjects, AXIS} from "./GameObject";
 import {Lever} from "./Lever";
 import {Slot} from "./Slot";
 import {Symbol} from "./Symbol";
@@ -39,7 +39,7 @@ export class SlotMachine implements GameObjects{
         // and   m = visibleObjects for each [Slot] reel
         
         this.targets = targets??[];
-        if(this.areValidTargs(targets??[],slots)){
+        if(!this.areValidTargs(this.targets,slots)){
             this.targets = [];
         }
 
@@ -63,9 +63,9 @@ export class SlotMachine implements GameObjects{
     // There must be equal number of targets in each [Slot] reel
     // as there are targets in each of the rows of [slots] respectively.
     areValidTargs(targs:Array<PIXI.Texture[]>,slots:Slot[]):boolean{
-        if (slots.length != targs.length) return false;
+        if (slots.length !== targs.length) return false;
         for(let i=0; i<slots.length;i++){
-            if (slots[i].visibleObjects != targs[i].length) return false
+            if (slots[i].visibleObjects !== targs[i].length) return false
         }
         return true;
     }
@@ -73,7 +73,7 @@ export class SlotMachine implements GameObjects{
     async start(colTargs?:Array<PIXI.Texture[]>){
 
         // Has targets
-        if(colTargs != undefined && colTargs.length != 0){
+        if(colTargs !== undefined && colTargs.length !== 0){
             if (this.areValidTargs(colTargs,this._slots)){
                 this.targets = colTargs;   
             }

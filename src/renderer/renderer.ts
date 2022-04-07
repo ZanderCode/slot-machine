@@ -7,6 +7,7 @@ export class Renderer{
   constructor() {
     this._application = new PIXI.Application({
       backgroundColor: 0x333333,
+      height:300,
       autoStart:true,
     });
 

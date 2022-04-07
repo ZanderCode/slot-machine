@@ -3,6 +3,7 @@ import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 
 // Create the skills assessment app
+///@ts-nocheck
 const app = new App();
 
 // If you want your app to work offline and load faster, you can change

@@ -10,9 +10,9 @@ export class Renderer{
       height:300,
       view:canvas,
       autoStart:true,
+      sharedLoader:false
     });
 
-    document.body.prepend(this._application.view);
   }
 
   // Exposes stage to App

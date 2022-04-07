@@ -1,8 +1,8 @@
-import {GameObject, AXIS} from "./gameobjects/GameObject";
-import {SlotMachine} from "./gameobjects/SlotMachine";
-import {Renderer} from './renderer/renderer';
-import {Lever} from './gameobjects/Lever';
-import {Slot} from "./gameobjects/Slot";
+import {GameObject, AXIS} from "../gameobjects/GameObject";
+import {SlotMachine} from "../gameobjects/SlotMachine";
+import {Renderer} from '../renderer/renderer';
+import {Lever} from '../gameobjects/Lever';
+import {Slot} from "../gameobjects/Slot";
 import * as PIXI from "pixi.js";
 
 // Helper for managing data and starting
@@ -37,8 +37,7 @@ export class App{
     this._gameObjects = new Map<string,GameObject>();     
 
     // Load Assets, Create Game Objects
-    this._loader = PIXI.Loader.shared;
-    this._loader.baseUrl = "assets/";
+    this._loader = new PIXI.Loader("assets/");
     this.addDataResource("water","water.png");
     this.addDataResource("rock","rock.png");
     this.addDataResource("lilly","lilly.png");

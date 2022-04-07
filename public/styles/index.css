@@ -1,23 +1,34 @@
 body{
-    background-color: lightgray;
+    margin:0;
+    top:0;
+    left:0;
+    padding:0;
+
 }
 
-canvas{
-   width:auto;
-   display: block;
-   position: absolute;
-   top:50%;
-   left: 50%;
-   transform: translate(-50%,-50%);
-   padding:10px;
+#header-root{
+    width:100vw;
+    padding:10px;
+    margin: auto;
 }
 
+#header{
+    font-size: 30px;
+    margin:auto;
+    position:sticky;
+    line-height: 30px;
+    text-align: center;
+    width:100%;
+    margin-bottom: 10px;
+}
 
-@media screen and (max-width:500px) {
+#root{
+    margin:auto;
+    width: min-content;
+}
+
+@media screen and (max-width:800px){
     canvas{
-        margin:auto;
         width:100vw;
-        height:auto;
-        display: block;
     }
 }

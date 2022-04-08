@@ -33,7 +33,7 @@ export class Classic{
   private static SPEED:number = 10;
 
   public constructor(canvas:HTMLCanvasElement) {
-    this._renderer = new Renderer(canvas);
+    this._renderer = new Renderer(canvas,500);
     this._dataResources = [];
     this._gameObjects = new Map<string,GameObject>();     
 
@@ -81,19 +81,21 @@ export class Classic{
     // Create [Slot]s
     let size:number = 100;
     let slots:Slot[] = [];
-    let amountOfSlots:number = 3;
+    let amountOfSlots:number = 5;
     for(let i=0;i<amountOfSlots;i++){
       slots.push(new Slot([seven,bar,watermelon],3,size,AXIS.Horizontal,Classic.SPEED));
     }   
      
     let leverRadius = size/2;
-    let lever = new Lever(size*4+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
+    let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*5)-(leverRadius*2));
 
     // For testing purposes
     let col1Target:PIXI.Texture[] = [bar,seven,watermelon];
     let col2Target:PIXI.Texture[] = [grape,seven,bar];
     let col3Target:PIXI.Texture[] = [watermelon,seven,star];
-    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target]
+    let col4Target:PIXI.Texture[] = [watermelon,seven,star];
+    let col5Target:PIXI.Texture[] = [watermelon,seven,star];
+    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
     let slot = new SlotMachine(lever,[...slots],AXIS.Horizontal,colTargs);
     

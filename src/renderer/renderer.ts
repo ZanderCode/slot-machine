@@ -4,10 +4,10 @@ import { GameObject } from "../gameobjects/GameObject"
 export class Renderer{
   private _application: PIXI.Application; 
 
-  constructor(canvas:HTMLCanvasElement) {
+  constructor(canvas:HTMLCanvasElement,size:number) {
     this._application = new PIXI.Application({
       backgroundColor: 0xffffff,
-      height:300,
+      height:size,
       view:canvas,
       autoStart:true,
       sharedLoader:false

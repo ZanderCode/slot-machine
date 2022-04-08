@@ -25,7 +25,7 @@ class DataResource{
 export class Frogger{
 
   private static SLOT_MACHINE = "SlotMachine";
-  private static VISIBLE_SYMBOLS:number = 3;
+  private static VISIBLE_SYMBOLS:number = 5;
   private static LEVER_POSITION_FACTOR = 6;
   private static SLOT_1:string = "SLOT1";
   private static SLOT_2:string = "SLOT2";
@@ -52,7 +52,7 @@ export class Frogger{
   public constructor(canvas:HTMLCanvasElement) {
     
     this._gameObjects = new Map<string,GameObject>();     
-    this._renderer = new Renderer(canvas);
+    this._renderer = new Renderer(canvas,Frogger.VISIBLE_SYMBOLS*Frogger.SIZE);
 
     // Load Assets
     this._loader = new PIXI.Loader(Frogger.ASSET_PATH);

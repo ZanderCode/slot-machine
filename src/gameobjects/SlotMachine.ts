@@ -104,11 +104,7 @@ export class SlotMachine implements GameObjects{
         return texturesMatrix;
     }
 
-    frame(delta:number):void{
-        if (this.isActive){
-            
-        }
-    }
+    frame(delta:number):void{}
 
     getRenderable():PIXI.DisplayObject{
         return this.child;

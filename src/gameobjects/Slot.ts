@@ -1,6 +1,11 @@
 import {GameObjects, AXIS} from "./GameObject";
 import * as PIXI from 'pixi.js';
 
+export enum SlotState{
+    RUNNING,
+    STOPPED
+}
+
 export class Slot implements GameObjects{
 
     public children:PIXI.Sprite[];
@@ -9,6 +14,8 @@ export class Slot implements GameObjects{
     private _isMoving:boolean;
     private _axis:AXIS;
     private _container:PIXI.Container;
+
+    public state:SlotState;
 
     private _size:number;
     public visibleObjects:number;
@@ -74,7 +81,6 @@ export class Slot implements GameObjects{
         while(this._textures.length < visibleObjects+1){
             this._textures.push(textures[Math.floor(Math.random()*textures.length)]);
         }
-
         
         this.children.push(...textures.flatMap((tex)=>{
             let spr = new PIXI.Sprite(tex);
@@ -84,10 +90,15 @@ export class Slot implements GameObjects{
         }));
 
         this._container.addChild(...this.children);
+
+        this.state = SlotState.STOPPED;
+
         this._align();
     }
 
     start(target?:PIXI.Texture[]){
+
+        this.state = SlotState.RUNNING;
 
         if (target !== undefined && target.length !== 0){
             this.targets = target;
@@ -103,7 +114,6 @@ export class Slot implements GameObjects{
             this.alignTargets = true;
         }else{
             this.aligned = true;
-            this._align();
         }
     }
 
@@ -136,6 +146,7 @@ export class Slot implements GameObjects{
             if((this.children[this.children.length-1].transform.position.y > this.visibleObjects*this._size) || 
             (this.children[this.children.length-1].transform.position.x > this.visibleObjects*this._size)){
                 if (this.aligned){
+                    this.state = SlotState.STOPPED;
                     this._isMoving = false;
                     this.aligned = false;
                     this._align(true);

@@ -2,7 +2,7 @@ import {GameObject, AXIS} from "../gameobjects/GameObject";
 import {SlotMachine, SlotStates} from "../gameobjects/SlotMachine";
 import {Renderer} from '../renderer/renderer';
 import {Lever} from '../gameobjects/Lever';
-import {Slot} from "../gameobjects/Slot";
+import {Slot, SlotState} from "../gameobjects/Slot";
 import * as PIXI from "pixi.js";
 import { Frog } from "./froggerlogic/Frog";
 
@@ -93,10 +93,10 @@ export class App{
     let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
 
     // For testing purposes
-    let col1Target:PIXI.Texture[] = [lilly,water,water];
-    let col2Target:PIXI.Texture[] = [lilly,water,water];
-    let col3Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col4Target:PIXI.Texture[] = [lilly,water,lilly];
+    let col1Target:PIXI.Texture[] = [rock,rock,lilly];
+    let col2Target:PIXI.Texture[] = [lilly,lilly,lilly];
+    let col3Target:PIXI.Texture[] = [water,water,water];
+    let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
     let col5Target:PIXI.Texture[] = [water,water,lilly];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
 
@@ -138,18 +138,27 @@ export class App{
 
     let slotMachine = gameObjects.get("SlotMachine") as SlotMachine;
     if (slotMachine.slotState === SlotStates.PRIZE){
-      // What happens when the slot finally stopped?
-      // Lets check the results and change state back to IDLE
-      slotMachine.slotState = SlotStates.IDLE;
-      let spriteMatrix:Array<PIXI.Sprite[]> = slotMachine.getResult();
-      //console.log(spriteMatrix);
+      
+      // Slots can still move into place after being stopped. TODO: fix this later. Not enough time.
+      if ((gameObjects.get("Slot0") as Slot).state == SlotState.STOPPED && 
+          (gameObjects.get("Slot1") as Slot).state == SlotState.STOPPED &&
+          (gameObjects.get("Slot2") as Slot).state == SlotState.STOPPED &&
+          (gameObjects.get("Slot3") as Slot).state == SlotState.STOPPED && 
+          (gameObjects.get("Slot4") as Slot).state == SlotState.STOPPED) {
 
-      // Deactivate all moving parts like lever, slots, etc.
-      // Activate frog to move
-      let frog = gameObjects.get("Frog") as Frog;
-      frog.followPath(spriteMatrix,textures.get("lilly")).then((success)=>{
-        console.log(success);
-      });
+        // What happens when the slots finally stopped?
+        // Lets check the results and change state back to IDLE
+        slotMachine.slotState = SlotStates.IDLE;
+        let spriteMatrix:Array<PIXI.Sprite[]> = slotMachine.getResult();
+        //console.log(spriteMatrix);
+
+        // Frog must search for a path to traverse.
+        let frog = gameObjects.get("Frog") as Frog;
+        frog.followPath(spriteMatrix,textures.get("lilly")).then((success)=>{
+          console.log(success);
+        });
+
+      }
     }
   }
   

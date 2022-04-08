@@ -68,22 +68,19 @@ export class Frog implements GameObject{
         // if not, then return no path, otherwise,
         // start path finding.
         let hasStart:boolean = false;
-        let row:number = 0;
+        let rows:number[] = [];
         for (let i=0; i < matrix[0].length;i++){
             if (matrix[0][i].texture === walkable){
                 hasStart = true;
-                path.push(matrix[0][i]);
-                row = i;
-                break;
+                rows.push(i);
             }
         } 
-
-        // Has a start point, keep going until no more or path found.
-        if (hasStart){
-            path = this.recursivePath(matrix,path,row,0,walkable);
+        for(let row=0;row<rows.length;row++){
+            path = [matrix[0][rows[row]]];
+            let p = this.recursivePath(matrix,path,rows[row],0,walkable);
+            if (matrix[matrix.length-1].includes(p[p.length-1])){return p}
         }
 
-        if (matrix[matrix.length-1].includes(path[path.length-1])){return path}
         return [];
     }
 
@@ -116,20 +113,25 @@ export class Frog implements GameObject{
             if (matrix[col+1][row].texture == target){
                 forward = matrix[col+1][row];
             }
-        }      
+        }    
+        
+        let p1 = undefined;
+        let p2 = undefined;
+        let p3 = undefined;
 
-        if (above !== undefined) {
-            return this.recursivePath(matrix,[...path, above],row-1,col,target);
-        }
-        if (below !== undefined) {
-            return this.recursivePath(matrix,[...path, below],row+1,col,target);
-        }
         // Recurse with new paths
         if (forward !== undefined) {
-            return this.recursivePath(matrix,[...path, forward],row,col+1,target);
+            p1 = this.recursivePath(matrix,[...path, forward],row,col+1,target);
+            if (matrix[matrix.length-1].includes(p1[p1.length-1])){return p1}
         }
-
-
+        if (above !== undefined) {
+            p2 = this.recursivePath(matrix,[...path, above],row-1,col,target);
+            if (matrix[matrix.length-1].includes(p2[p2.length-1])){return p2}
+        }
+        if (below !== undefined) {
+            p3 =  this.recursivePath(matrix,[...path, below],row+1,col,target);
+            if (matrix[matrix.length-1].includes(p3[p3.length-1])){return p3}
+        }
         return []; // no last column.... failed
     }
 

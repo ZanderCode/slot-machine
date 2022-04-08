@@ -1,6 +1,12 @@
 import {GameObject} from "./GameObject";
 import * as PIXI from 'pixi.js';
 
+// This class was never used, but in the future,
+// I plan to have Symbols be passed into the [Slot]
+// class. That way when prize checking occurs
+// after the user spins the [SlotMachine], I can
+// check against Symbol types instead of directly,
+// checking the [PIXI.Sprite]s.
 export class Symbol<T> implements GameObject{
 
     child: PIXI.Sprite;

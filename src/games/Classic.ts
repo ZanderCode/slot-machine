@@ -83,16 +83,16 @@ export class Classic{
     let slots:Slot[] = [];
     let amountOfSlots:number = 3;
     for(let i=0;i<amountOfSlots;i++){
-      slots.push(new Slot([seven,bar,grape,star,watermelon],3,size,AXIS.Horizontal,Classic.SPEED));
+      slots.push(new Slot([seven,bar,watermelon],3,size,AXIS.Horizontal,Classic.SPEED));
     }   
      
     let leverRadius = size/2;
     let lever = new Lever(size*4+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
 
     // For testing purposes
-    let col1Target:PIXI.Texture[] = [bar,seven,watermelon,star,bar];
-    let col2Target:PIXI.Texture[] = [grape,seven,bar,grape,bar];
-    let col3Target:PIXI.Texture[] = [watermelon,seven,star,seven,grape];
+    let col1Target:PIXI.Texture[] = [bar,seven,watermelon];
+    let col2Target:PIXI.Texture[] = [grape,seven,bar];
+    let col3Target:PIXI.Texture[] = [watermelon,seven,star];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target]
 
     let slot = new SlotMachine(lever,[...slots],AXIS.Horizontal,colTargs);

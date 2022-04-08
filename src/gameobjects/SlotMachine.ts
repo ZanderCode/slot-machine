@@ -11,6 +11,8 @@ export enum SlotStates{
     PRIZE
 }
 
+// [SlotMachine] is responsible for stopping and 
+// starting all slots.
 export class SlotMachine implements GameObjects{
 
     children: PIXI.DisplayObject[];
@@ -36,7 +38,6 @@ export class SlotMachine implements GameObjects{
         // TODO: check coltargs. If invalid dimensions (nxm), then choose random and console log error.
         // where n = slots.length
         // and   m = visibleObjects for each [Slot] reel
-        
         this.targets = targets??[];
         if(!this.areValidTargs(this.targets,slots)){
             this.targets = [];
@@ -62,9 +63,7 @@ export class SlotMachine implements GameObjects{
                 this.child.addChild(slots[slotIndex].getRenderable());
             }
         }
-
         this.child.addChild(lever.getRenderable());
-
         this.isActive = false;
     }
 
@@ -79,7 +78,6 @@ export class SlotMachine implements GameObjects{
     }
 
     async start(colTargs?:Array<PIXI.Texture[]>){
-
         // Has targets
         if(colTargs !== undefined && colTargs.length !== 0){
             if (this.areValidTargs(colTargs,this._slots)){

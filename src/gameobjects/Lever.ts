@@ -1,6 +1,14 @@
 import {GameObject} from "./GameObject";
 import * as PIXI from 'pixi.js';
 
+// A class that acts as a visual button.
+// Just like all [GameObject]s, this 
+// class has a frame by frame behavior.
+//
+// Additionally, click behaviors are defined
+// and routed back to where the class
+// is implemented via a callback so that a lever
+// can control something.
 export class Lever implements GameObject{
 
     child: PIXI.Container;
@@ -58,12 +66,24 @@ export class Lever implements GameObject{
         this.child.interactive = true;
     }
 
+    // This is where an outside class would
+    // react to a lever click.
     addActivateBehavior(action:Function){
         this.child.addListener("click", ()=>{this.onClick(action)});
         this.child.addListener("touchstart", ()=>{this.onClick(action)});
     }
+    async onClick(action:Function){
+        // Click and reset once done.
+        if (!this.isActive && this.willRegister){
+            this.isActive = true;
+            this.willRegister = false;
+            await action().then(()=>{
+                this.willRegister = true;
+            });
+        }
+    }
     
-    //TODO: chagne
+    // Animate the lever click movement.
     moveBy:number = 10;
     moveTotal:number = 0;
     isMovingDown:boolean = true;
@@ -88,18 +108,7 @@ export class Lever implements GameObject{
             }
         }
     }
-
-    async onClick(action:Function){
-        // Click and reset once done.
-        if (!this.isActive && this.willRegister){
-            this.isActive = true;
-            this.willRegister = false;
-            await action().then(()=>{
-                this.willRegister = true;
-            });
-        }
-    }
-
+    
     getRenderable():PIXI.DisplayObject{
         return this.child;
     }

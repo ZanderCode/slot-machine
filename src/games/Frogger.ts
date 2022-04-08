@@ -1,10 +1,10 @@
-import {GameObject, AXIS} from "../gameobjects/GameObject";
 import {SlotMachine, SlotStates} from "../gameobjects/SlotMachine";
+import {GameObject, AXIS} from "../gameobjects/GameObject";
+import {Slot, SlotState} from "../gameobjects/Slot";
 import {Renderer} from '../renderer/renderer';
 import {Lever} from '../gameobjects/Lever';
-import {Slot, SlotState} from "../gameobjects/Slot";
-import * as PIXI from "pixi.js";
 import { Frog } from "./froggerlogic/Frog";
+import * as PIXI from "pixi.js";
 
 // Helper for managing data and starting
 // Asset and GameObject creation during
@@ -23,30 +23,48 @@ class DataResource{
 // - Creates [GameObject]s
 // - Starts game loop
 export class Frogger{
+
+  private static SLOT_MACHINE = "SlotMachine";
+  private static VISIBLE_SYMBOLS:number = 3;
+  private static LEVER_POSITION_FACTOR = 6;
+  private static SLOT_1:string = "SLOT1";
+  private static SLOT_2:string = "SLOT2";
+  private static SLOT_3:string = "SLOT3";
+  private static SLOT_4:string = "SLOT4";
+  private static SLOT_5:string = "SLOT5";
+  private static LEVER:string = "Lever";
+  private static FROG:string = "Frog";
+  private static SPEED:number = 15;
+  private static SIZE:number = 100;
+  private static ASSET_PATH = "/assets/" 
+  
+  private static WATER_RES:string = "water";
+  private static LILLY_RES:string = "lily";
+  private static ROCK_RES:string = "rock";
+
   private _renderer: Renderer;
   private _loader:PIXI.Loader;
 
-  //_sprite:string refers to _dataResources.name
-  private _dataResources:DataResource[];
-  private _gameObjects:Map<string,GameObject>;
+  // Data and [GameObject]s that are loaded into our application.
   private _loadedTextures:Map<string,PIXI.Texture> = new Map<string,PIXI.Texture>();
-
-  private static SPEED:number = 10;
-
+  private _gameObjects:Map<string,GameObject>;
 
   public constructor(canvas:HTMLCanvasElement) {
-    this._renderer = new Renderer(canvas);
-    this._dataResources = [];
+    
     this._gameObjects = new Map<string,GameObject>();     
+    this._renderer = new Renderer(canvas);
 
-    // Load Assets, Create Game Objects
-    this._loader = new PIXI.Loader("assets/");
-    this.addDataResource("water","water.png");
-    this.addDataResource("rock","rock.png");
-    this.addDataResource("lilly","lilly.png");
-    this.addDataResource("frog","phrog.png");
+    // Load Assets
+    this._loader = new PIXI.Loader(Frogger.ASSET_PATH);
+    this.addDataResource(Frogger.WATER_RES,"water.png");
+    this.addDataResource(Frogger.ROCK_RES,"rock.png");
+    this.addDataResource(Frogger.LILLY_RES,"lilly.png");
+    this.addDataResource(Frogger.FROG,"phrog.png");
 
-    this._loader.onComplete.add(()=>this.createGameObjects(true));
+    // We can't start the game until all assets are loaded.
+    this._loader.onComplete.add(()=>{
+      this.createGameObjects(true);
+    });
     this._loader.load();
   }
 
@@ -54,66 +72,52 @@ export class Frogger{
   addDataResource(name:string,path:string){
     let res = new DataResource(name,path);
     this._loader.add(res.name,res.path);
-    this._dataResources.push(res);
   }
 
   // All assets have been loaded, create [GameObjects] from them
   createGameObjects(startGameLoop:boolean=false){
     
-    // Create [GameObject]s and other renderables.
-    let waterTextureName = this._dataResources[0].name;
-    let rockTextureName = this._dataResources[1].name;
-    let lillyPadTextureName = this._dataResources[2].name;
-    let frogTextureName = this._dataResources[3].name;
     // Grab the textures from the resources
-    let water = this._loader.resources[waterTextureName].texture;
-    let rock = this._loader.resources[rockTextureName].texture;
-    let lilly = this._loader.resources[lillyPadTextureName].texture;
-    let frog = this._loader.resources[frogTextureName].texture;
+    let water = this._loader.resources[Frogger.WATER_RES].texture;
+    let rock = this._loader.resources[Frogger.ROCK_RES].texture;
+    let lilly = this._loader.resources[Frogger.LILLY_RES].texture;
+    let frog = this._loader.resources[Frogger.FROG].texture;
+    this._loadedTextures.set(Frogger.WATER_RES,water);
+    this._loadedTextures.set(Frogger.ROCK_RES,rock);
+    this._loadedTextures.set(Frogger.LILLY_RES,lilly);
 
-    this._loadedTextures.set(waterTextureName,water);
-    this._loadedTextures.set(rockTextureName,rock);
-    this._loadedTextures.set(lillyPadTextureName,lilly);
+    let leverRadius = Frogger.SIZE/2;
+    let leverX = Frogger.SIZE*Frogger.LEVER_POSITION_FACTOR+leverRadius;
+    let leverH = (Frogger.SIZE*Frogger.VISIBLE_SYMBOLS)-(leverRadius*2);
+    let leverY = leverRadius;
+    let leverW = leverRadius;
 
-    // Create [Slot]s
-    let size:number = 100;
-    let slots:Slot[] = [];
-    let amountOfSlots:number = 5;
-    for(let i=0;i<amountOfSlots;i++){
-      slots.push(new Slot([water,rock,lilly],3,size,AXIS.Vertical,Frogger.SPEED));
-    }   
-     
-    let leverRadius = size/2;
-    let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
+    let slot1 = new Slot([water,rock,lilly,lilly,lilly],Frogger.VISIBLE_SYMBOLS,Frogger.SIZE,AXIS.Vertical,Frogger.SPEED)
+    let slot2 = new Slot([water,rock,lilly,lilly,lilly],Frogger.VISIBLE_SYMBOLS,Frogger.SIZE,AXIS.Vertical,Frogger.SPEED)
+    let slot3 = new Slot([water,rock,lilly,lilly,lilly],Frogger.VISIBLE_SYMBOLS,Frogger.SIZE,AXIS.Vertical,Frogger.SPEED)
+    let slot4 = new Slot([water,rock,lilly,lilly,lilly],Frogger.VISIBLE_SYMBOLS,Frogger.SIZE,AXIS.Vertical,Frogger.SPEED)
+    let slot5 = new Slot([water,rock,lilly,lilly,lilly],Frogger.VISIBLE_SYMBOLS,Frogger.SIZE,AXIS.Vertical,Frogger.SPEED)
+    let lever = new Lever(leverX,leverY,leverW,leverH);
+    let slot = new SlotMachine(lever,[slot1,slot2,slot3,slot4,slot5],AXIS.Vertical);
+    let frogObj:Frog = new Frog(frog,Frogger.SIZE);
 
-    // For testing purposes
-    let col1Target:PIXI.Texture[] = [rock,rock,lilly];
-    let col2Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col3Target:PIXI.Texture[] = [water,water,lilly];
-    let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col5Target:PIXI.Texture[] = [water,water,lilly];
-    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
-
-    let slot = new SlotMachine(lever,[...slots],AXIS.Vertical,colTargs);
-    
     lever.addActivateBehavior(async ()=>{
       await slot.start();
       await slot.stop();
     });
-
-    // Create frog
-    let frogObj:Frog = new Frog(frog,size);
     
-    this._gameObjects.set("SlotMachine", slot);
-    for(let i=0;i<amountOfSlots;i++){
-      this._gameObjects.set("Slot"+i.toString(),slots[i]);
-    }
-    this._gameObjects.set("Lever",lever);   
-    this._gameObjects.set("Frog",frogObj);
+    this._gameObjects.set(Frogger.SLOT_MACHINE, slot);
+    this._gameObjects.set(Frogger.SLOT_1,slot1);
+    this._gameObjects.set(Frogger.SLOT_2,slot2);
+    this._gameObjects.set(Frogger.SLOT_3,slot3);
+    this._gameObjects.set(Frogger.SLOT_4,slot4);
+    this._gameObjects.set(Frogger.SLOT_5,slot5);
+    this._gameObjects.set(Frogger.LEVER,lever);   
+    this._gameObjects.set(Frogger.FROG,frogObj);
 
-    this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
-
-
+    this._gameObjects.forEach((go)=>{
+      this._renderer.addToStage(go.getRenderable())
+    });
     // Start Game Loop
     // In order to use the gameLoop callback, we must pass through
     // all of the game objects created by this function.
@@ -125,22 +129,20 @@ export class Frogger{
   // Game Logic and state management
   // States = Idle, Rolling, Stopping, Prize
   gameLoop(delta:number,gameObjects:Map<string,GameObject>,textures:Map<string,PIXI.Texture>){
-  
-    
+
     gameObjects.forEach(go => {
       go.frame(delta);
     });
 
-
-    let slotMachine = gameObjects.get("SlotMachine") as SlotMachine;
+    let slotMachine = gameObjects.get(Frogger.SLOT_MACHINE) as SlotMachine;
     if (slotMachine.slotState === SlotStates.PRIZE){
       
       // Slots can still move into place after being stopped. TODO: fix this later. Not enough time.
-      if ((gameObjects.get("Slot0") as Slot).state == SlotState.STOPPED && 
-          (gameObjects.get("Slot1") as Slot).state == SlotState.STOPPED &&
-          (gameObjects.get("Slot2") as Slot).state == SlotState.STOPPED &&
-          (gameObjects.get("Slot3") as Slot).state == SlotState.STOPPED && 
-          (gameObjects.get("Slot4") as Slot).state == SlotState.STOPPED) {
+      if ((gameObjects.get(Frogger.SLOT_1) as Slot).state == SlotState.STOPPED && 
+          (gameObjects.get(Frogger.SLOT_2) as Slot).state == SlotState.STOPPED &&
+          (gameObjects.get(Frogger.SLOT_3) as Slot).state == SlotState.STOPPED &&
+          (gameObjects.get(Frogger.SLOT_4) as Slot).state == SlotState.STOPPED && 
+          (gameObjects.get(Frogger.SLOT_5) as Slot).state == SlotState.STOPPED) {
 
         // What happens when the slots finally stopped?
         // Lets check the results and change state back to IDLE
@@ -149,10 +151,14 @@ export class Frogger{
         //console.log(spriteMatrix);
 
         // Frog must search for a path to traverse.
-        let frog = gameObjects.get("Frog") as Frog;
-        frog.followPath(spriteMatrix,textures.get("lilly")).then((success)=>{
+        let frog = gameObjects.get(Frogger.FROG) as Frog;
+        frog.followPath(spriteMatrix,textures.get(Frogger.LILLY_RES)).then((success)=>{
           //calculate prize
-          console.log("FROG BONUS");
+          if (success){
+            console.log("FROG BONUS!");
+          }else{
+            console.log("NO FROG BONUS!")
+          }
         });
       }
     }

@@ -6,6 +6,8 @@ export enum SlotState{
     STOPPED
 }
 
+// A [Slot] will create sprites and align
+// them, and scroll them upon a state change.
 export class Slot implements GameObjects{
 
     public children:PIXI.Sprite[];
@@ -66,7 +68,7 @@ export class Slot implements GameObjects{
         // Add a boarder so we know the bounds
         let border = new PIXI.Container();
         let g2 = new PIXI.Graphics();
-        g2.beginFill(0x0000ff);
+        g2.beginFill(0xCCCCCC);
         if (this._axis === AXIS.Vertical){
             g2.drawRect(0,0,this._size,this.visibleObjects*this._size);
         }else{
@@ -90,31 +92,32 @@ export class Slot implements GameObjects{
         }));
 
         this._container.addChild(...this.children);
-
         this.state = SlotState.STOPPED;
-
         this._align();
     }
 
+    // Starts the [Slot] reel animation and sets
+    // appropriate flags for [frame()] function
+    //
+    // target: can be defined to specifc what slot
+    // will look like when [stop()] is called.
     start(target?:PIXI.Texture[]){
-
         this.state = SlotState.RUNNING;
-
         if (target !== undefined && target.length !== 0){
             this.targets = target;
             this.alignTargetIndex = target.length-1;
         }
-
         this.isActive = true;
         this._isMoving = true;
     }
 
+    // Stops the [Slot] by setting appropriate flags
     stop(){
         if (this.targets !== undefined && this.targets.length !== 0){
             this.alignTargets = true;
         }else{
-            this._align(true);
             this.aligned = true;
+            this._align();
         }
     }
 
@@ -127,8 +130,7 @@ export class Slot implements GameObjects{
         this._align();
 
         // Since all elements are based on the position of the first, we just need to move the first,
-        // then the rest of the childnre follow.
-        
+        // then the rest of the childnre follow:
         if (this._isMoving){
             if (this._axis === AXIS.Horizontal){
                 this.children[0].transform.position.x = this.children[0].position.x + (this.moveAmount*delta)
@@ -136,16 +138,11 @@ export class Slot implements GameObjects{
                 this.children[0].transform.position.y = this.children[0].position.y + (this.moveAmount*delta)
             }
 
-            // Dont if an item goes off screen define its behavior here.
-            // for example, we can move the last item that went off screen to the
-            // top of the container. Or we can completley generate a new object to
-            // place at the top and delete the one that went off screen.
-            // TODO: Add a factory class that creates [Slot]s
-                // MovableColumns.NextRandom
-                // MoveableComuns.DefinedList 
-
+            // When a symbol goes off screen, we want to shift it back to the top,
+            // the is the reel animation bevaior.
             if((this.children[this.children.length-1].transform.position.y > this.visibleObjects*this._size) || 
             (this.children[this.children.length-1].transform.position.x > this.visibleObjects*this._size)){
+                // Usually we want to stop movement right when the last symbol went off screen:
                 if (this.aligned){
                     this.state = SlotState.STOPPED;
                     this._isMoving = false;
@@ -157,6 +154,9 @@ export class Slot implements GameObjects{
         }   
     }
 
+    // Depeding on the AXIS direction, the elements that went off screen -
+    // the last symbols in the [children] object - will be set back to the front of
+    // list and will be moved to the top of the reel.  
     private shift(){
         let last = this.children[this.children.length-1]
         if (this._axis === AXIS.Vertical){
@@ -168,7 +168,6 @@ export class Slot implements GameObjects{
             last.setTransform(this.children[0].transform.position.x-this._size,0,last.scale.x,last.scale.y);
             this.children.unshift(last);
         }
-        // The next on the [Slot] reel must be something random.
 
         // If we have targets, then we should be able specify those and have our [Slot] reel
         // stop on those targets. We shall [shift()] them in one at a time and then stop the reel.
@@ -180,7 +179,7 @@ export class Slot implements GameObjects{
                 this.alignTargets = false;
                 this.aligned = true;
             }
-        }else{
+        }else{ // If we have no targets, then just assign the last symbol to something random.
             last.texture = this._textures[Math.floor(Math.random()*this._textures.length)];
         }
     }

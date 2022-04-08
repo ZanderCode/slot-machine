@@ -1,0 +1,31 @@
+ul{
+    display: inline-block;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0 10px 0 10px;
+}
+li{
+    float:left;
+    list-style-type: none;
+}
+
+li:not(:last-child){
+    margin-right: 20px;
+}
+
+a{
+    cursor: pointer;
+}
+
+
+#nav{
+    width: fit-content;
+    border:1px solid black;
+    margin: auto;
+    display: block;
+    min-width:  fit-content;
+}
+
+a:hover{
+    background-color: lightgray;
+}

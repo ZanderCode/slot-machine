@@ -6,10 +6,12 @@ body{
 
 #root{
     border: url("../assets/border.png/");
+    margin:auto;
+    width: min-content;
 }
 
 #header-root{
-    width:100vw;
+    width:90vw;
     padding:10px;
     margin: auto;
 }
@@ -24,13 +26,11 @@ body{
     margin-bottom: 10px;
 }
 
-#root{
-    margin:auto;
-    width: min-content;
-}
-
 @media screen and (max-width:800px){
     canvas{
         width:100vw;
+    }
+    #root{
+        width: 95vw;
     }
 }

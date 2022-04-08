@@ -16,6 +16,17 @@ body{
     margin: auto;
 }
 
+.bonus{
+    background-color: greenyellow;
+    padding:5px;
+    border-radius: 20px;
+}
+.cards li{
+    border:1px solid black;
+    padding:5px;
+    border-radius: 20px;
+}
+
 #header{
     font-size: 30px;
     margin:auto;

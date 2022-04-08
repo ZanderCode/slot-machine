@@ -38,7 +38,7 @@ export class App{
   private _gameObjects:Map<string,GameObject>;
   private _loadedTextures:Map<string,PIXI.Texture> = new Map<string,PIXI.Texture>();
 
-  private static SPEED:number = 10;
+  private static SPEED:number = 5;
 
   public constructor(canvas:HTMLCanvasElement) {
     this._renderer = new Renderer(canvas);
@@ -95,7 +95,7 @@ export class App{
     // For testing purposes
     let col1Target:PIXI.Texture[] = [rock,rock,lilly];
     let col2Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col3Target:PIXI.Texture[] = [water,water,water];
+    let col3Target:PIXI.Texture[] = [water,water,lilly];
     let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
     let col5Target:PIXI.Texture[] = [water,water,lilly];
     let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]

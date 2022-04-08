@@ -113,6 +113,7 @@ export class Slot implements GameObjects{
         if (this.targets !== undefined && this.targets.length !== 0){
             this.alignTargets = true;
         }else{
+            this._align(true);
             this.aligned = true;
         }
     }

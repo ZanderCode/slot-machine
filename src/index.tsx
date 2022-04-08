@@ -1,15 +1,15 @@
 import './index.css';
-import { App } from './games/app';
+import { Frogger } from './games/Frogger';
+import { Classic } from './games/Classic';
 import * as serviceWorker from './serviceWorker';
 
 // Create the skills assessment app
 window.onload = () =>{
     let canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    const froggerApp = new Frogger(canvas);
+
     let canvas2 = document.getElementById("canvas2") as HTMLCanvasElement;
-    let canvas3 = document.getElementById("canvas3") as HTMLCanvasElement;
-    const app = new App(canvas);
-    const app2 = new App(canvas2);
-    const app3 = new App(canvas3);
+    const classicApp = new Classic(canvas2);
 }
 
 

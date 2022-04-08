@@ -4,7 +4,6 @@ import {Renderer} from '../renderer/renderer';
 import {Lever} from '../gameobjects/Lever';
 import {Slot, SlotState} from "../gameobjects/Slot";
 import * as PIXI from "pixi.js";
-import { Frog } from "./froggerlogic/Frog";
 
 // Helper for managing data and starting
 // Asset and GameObject creation during
@@ -18,18 +17,11 @@ class DataResource{
   }
 }
 
-
-export enum FroggerType{
-  WATER,
-  LILLY,
-  ROCK
-}
-
 // Main app:
 // - Loads assets
 // - Creates [GameObject]s
 // - Starts game loop
-export class App{
+export class Classic{
   private _renderer: Renderer;
   private _loader:PIXI.Loader;
 
@@ -38,7 +30,7 @@ export class App{
   private _gameObjects:Map<string,GameObject>;
   private _loadedTextures:Map<string,PIXI.Texture> = new Map<string,PIXI.Texture>();
 
-  private static SPEED:number = 5;
+  private static SPEED:number = 10;
 
   public constructor(canvas:HTMLCanvasElement) {
     this._renderer = new Renderer(canvas);
@@ -47,10 +39,11 @@ export class App{
 
     // Load Assets, Create Game Objects
     this._loader = new PIXI.Loader("assets/");
-    this.addDataResource("water","water.png");
-    this.addDataResource("rock","rock.png");
-    this.addDataResource("lilly","lilly.png");
-    this.addDataResource("frog","phrog.png");
+    this.addDataResource("7","7.png");
+    this.addDataResource("grape","grape.png");
+    this.addDataResource("star","star.png");
+    this.addDataResource("watermelon","watermelon.png");
+    this.addDataResource("bar","bar.png");
 
     this._loader.onComplete.add(()=>this.createGameObjects(true));
     this._loader.load();
@@ -67,58 +60,54 @@ export class App{
   createGameObjects(startGameLoop:boolean=false){
     
     // Create [GameObject]s and other renderables.
-    let waterTextureName = this._dataResources[0].name;
-    let rockTextureName = this._dataResources[1].name;
-    let lillyPadTextureName = this._dataResources[2].name;
-    let frogTextureName = this._dataResources[3].name;
+    let sevenName = this._dataResources[0].name;
+    let barName = this._dataResources[1].name;
+    let grapeName = this._dataResources[2].name;
+    let starName = this._dataResources[3].name;
+    let watermelonName = this._dataResources[4].name;
     // Grab the textures from the resources
-    let water = this._loader.resources[waterTextureName].texture;
-    let rock = this._loader.resources[rockTextureName].texture;
-    let lilly = this._loader.resources[lillyPadTextureName].texture;
-    let frog = this._loader.resources[frogTextureName].texture;
+    let seven = this._loader.resources[sevenName].texture;
+    let bar = this._loader.resources[barName].texture;
+    let grape = this._loader.resources[grapeName].texture;
+    let star = this._loader.resources[starName].texture;
+    let watermelon = this._loader.resources[watermelonName].texture;
 
-    this._loadedTextures.set(waterTextureName,water);
-    this._loadedTextures.set(rockTextureName,rock);
-    this._loadedTextures.set(lillyPadTextureName,lilly);
+    this._loadedTextures.set(sevenName,seven);
+    this._loadedTextures.set(barName,bar);
+    this._loadedTextures.set(grapeName,grape);
+    this._loadedTextures.set(starName,star);
+    this._loadedTextures.set(watermelonName,watermelon);
 
     // Create [Slot]s
     let size:number = 100;
     let slots:Slot[] = [];
-    let amountOfSlots:number = 5;
+    let amountOfSlots:number = 3;
     for(let i=0;i<amountOfSlots;i++){
-      slots.push(new Slot([water,rock,lilly],3,size,AXIS.Vertical,App.SPEED));
+      slots.push(new Slot([seven,bar,grape,star,watermelon],3,size,AXIS.Horizontal,Classic.SPEED));
     }   
      
     let leverRadius = size/2;
-    let lever = new Lever(size*6+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
+    let lever = new Lever(size*4+leverRadius,leverRadius,leverRadius,(size*3)-(leverRadius*2));
 
     // For testing purposes
-    let col1Target:PIXI.Texture[] = [rock,rock,lilly];
-    let col2Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col3Target:PIXI.Texture[] = [water,water,lilly];
-    let col4Target:PIXI.Texture[] = [lilly,lilly,lilly];
-    let col5Target:PIXI.Texture[] = [water,water,lilly];
-    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target,col4Target,col5Target]
+    let col1Target:PIXI.Texture[] = [bar,seven,watermelon,star,bar];
+    let col2Target:PIXI.Texture[] = [grape,seven,bar,grape,bar];
+    let col3Target:PIXI.Texture[] = [watermelon,seven,star,seven,grape];
+    let colTargs:Array<PIXI.Texture[]> = [col1Target,col2Target,col3Target]
 
-    let slot = new SlotMachine(lever,[...slots],colTargs);
+    let slot = new SlotMachine(lever,[...slots],AXIS.Horizontal,colTargs);
     
     lever.addActivateBehavior(async ()=>{
       await slot.start();
       await slot.stop();
     });
-
-    // Create frog
-    let frogObj:Frog = new Frog(frog,size);
-
     
     this._gameObjects.set("SlotMachine", slot);
     for(let i=0;i<amountOfSlots;i++){
       this._gameObjects.set("Slot"+i.toString(),slots[i]);
     }
     this._gameObjects.set("Lever",lever);   
-    this._gameObjects.set("Frog",frogObj);
     this._gameObjects.forEach((go)=>this._renderer.addToStage(go.getRenderable()));
-
 
     // Start Game Loop
     // In order to use the gameLoop callback, we must pass through
@@ -131,10 +120,12 @@ export class App{
   // Game Logic and state management
   // States = Idle, Rolling, Stopping, Prize
   gameLoop(delta:number,gameObjects:Map<string,GameObject>,textures:Map<string,PIXI.Texture>){
+  
     
     gameObjects.forEach(go => {
       go.frame(delta);
     });
+
 
     let slotMachine = gameObjects.get("SlotMachine") as SlotMachine;
     if (slotMachine.slotState === SlotStates.PRIZE){
@@ -142,24 +133,15 @@ export class App{
       // Slots can still move into place after being stopped. TODO: fix this later. Not enough time.
       if ((gameObjects.get("Slot0") as Slot).state == SlotState.STOPPED && 
           (gameObjects.get("Slot1") as Slot).state == SlotState.STOPPED &&
-          (gameObjects.get("Slot2") as Slot).state == SlotState.STOPPED &&
-          (gameObjects.get("Slot3") as Slot).state == SlotState.STOPPED && 
-          (gameObjects.get("Slot4") as Slot).state == SlotState.STOPPED) {
+          (gameObjects.get("Slot2") as Slot).state == SlotState.STOPPED) {
 
         // What happens when the slots finally stopped?
         // Lets check the results and change state back to IDLE
         slotMachine.slotState = SlotStates.IDLE;
         let spriteMatrix:Array<PIXI.Sprite[]> = slotMachine.getResult();
-        //console.log(spriteMatrix);
 
-        // Frog must search for a path to traverse.
-        let frog = gameObjects.get("Frog") as Frog;
-        frog.followPath(spriteMatrix,textures.get("lilly")).then((success)=>{
-          console.log(success);
-        });
-
+        // Do something with result
       }
     }
   }
-  
 }

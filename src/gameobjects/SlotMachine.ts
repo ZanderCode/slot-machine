@@ -25,10 +25,10 @@ export class SlotMachine implements GameObjects{
     public slotState:SlotStates;
     private targets:Array<PIXI.Texture[]>;
 
-    constructor(lever:Lever,slots:Slot[],targets?:Array<PIXI.Texture[]>){
+    constructor(lever:Lever,slots:Slot[],axis:AXIS,targets?:Array<PIXI.Texture[]>){
         this.children = [];
         this.child = new PIXI.Container();
-        this.axis = AXIS.Vertical;
+        this.axis = axis;
 
         this._slots = slots;
         this._lever = lever;
@@ -49,11 +49,20 @@ export class SlotMachine implements GameObjects{
         // Add the [Lever] as a child of the [SlotMachine]
         // Also move them into place.
         let prev:number = 0;
-        for(let slotIndex = 0; slotIndex < slots.length; slotIndex++){
-            slots[slotIndex].getRenderable().transform.position.x = prev;
-            prev += slots[slotIndex].getRenderable().getBounds().width;
-            this.child.addChild(slots[slotIndex].getRenderable());
+        if (this.axis == AXIS.Vertical){
+            for(let slotIndex = 0; slotIndex < slots.length; slotIndex++){
+                slots[slotIndex].getRenderable().transform.position.x = prev;
+                prev += slots[slotIndex].getRenderable().getBounds().width;
+                this.child.addChild(slots[slotIndex].getRenderable());
+            }
+        }else{
+            for(let slotIndex = 0; slotIndex < slots.length; slotIndex++){
+                slots[slotIndex].getRenderable().transform.position.y = prev;
+                prev += slots[slotIndex].getRenderable().getBounds().height;
+                this.child.addChild(slots[slotIndex].getRenderable());
+            }
         }
+
         this.child.addChild(lever.getRenderable());
 
         this.isActive = false;

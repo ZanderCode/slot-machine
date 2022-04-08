@@ -6,6 +6,10 @@ body{
 
 }
 
+#root{
+    border: url("../assets/border.png/");
+}
+
 #header-root{
     width:100vw;
     padding:10px;

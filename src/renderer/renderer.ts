@@ -6,13 +6,22 @@ export class Renderer{
 
   constructor(canvas:HTMLCanvasElement) {
     this._application = new PIXI.Application({
-      backgroundColor: 0x333333,
+      backgroundColor: 0xffffff,
       height:300,
       view:canvas,
       autoStart:true,
       sharedLoader:false
     });
 
+  }
+
+  getWidth():number{
+    return this._application.view.width;
+  }
+
+  
+  getHeight():number{
+    return this._application.view.height;
   }
 
   // Exposes stage to App

@@ -1,16 +1,21 @@
 import {GameObject} from "../../gameobjects/GameObject";
 import * as PIXI from 'pixi.js';
 import { markAsUntransferable } from "worker_threads";
+import { textChangeRangeIsUnchanged } from "typescript";
 
 export class Frog implements GameObject{
 
     child: PIXI.Sprite;
     isActive: boolean;
 
+    private path:PIXI.Sprite[];
+
     constructor(frog:PIXI.Texture, size:number){
         this.child = new PIXI.Sprite(frog);
         this.child.width = size;
         this.child.height = size;
+
+        this.child.transform.position.x = - this.child.width;
     }
 
     async followPath(matrix:Array<PIXI.Sprite[]>,walkableTextures:PIXI.Texture):Promise<boolean>{
@@ -19,6 +24,8 @@ export class Frog implements GameObject{
         let path = this.getPath(matrix,walkableTextures);
         if (path.length == 0) return false;
 
+        this.isActive = true;
+
         for(let i=0; i<path.length;i++){
             let spr = path[i];
             this.child.transform.position.y = spr.transform.position.y;
@@ -26,47 +33,15 @@ export class Frog implements GameObject{
             await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        return true;
+        this.child.transform.position.x = - this.child.width;
 
-        // for(let col=0; col<matrix.length;col++){
-        //     let foundInColumn:boolean=false;
-        //     for(let row=0; row<matrix[col].length;row++){
-        //         if (matrix[col][row].texture === walkableTextures){
-        //             this.child.transform.position.y = matrix[col][row].transform.position.y;
-        //             this.child.transform.position.x = matrix[col][row].getBounds().x;
-        //             await new Promise(resolve => setTimeout(resolve, 200));
-        //             foundInColumn = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!foundInColumn){
-        //         //reset to beginning
-        //         this.child.transform.position.y = matrix[0][1].transform.position.y;
-        //         this.child.transform.position.x = matrix[0][1].getBounds().x;
-        //         return;
-        //     }
-        // }
+        return true;
     }
 
     getPath(matrix:Array<PIXI.Sprite[]>,walkable:PIXI.Texture):PIXI.Sprite[]{
 
         let path:PIXI.Sprite[] = [];
 
-        // start at beginning: first column
-        // check if lilly pad
-        // if not return no path
-        // if so then recurse and find longest path
-
-        // movements: up, down, forward
-        // check all direction
-        // if path found
-        // if standing on last space, then return path.
-        // if next space is equal to the previous space, then return path.
-        // if no spaces to traverse, then return path;
-
-        // First find if there is a starting point,
-        // if not, then return no path, otherwise,
-        // start path finding.
         let hasStart:boolean = false;
         let rows:number[] = [];
         for (let i=0; i < matrix[0].length;i++){
